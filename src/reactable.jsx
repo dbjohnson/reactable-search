@@ -206,8 +206,8 @@ const TableHeader = (props) => {
       {props.col}
       {props.sortBy ?
         (props.sortDesc ?
-          <i className="fa fa-arrow-down" style={props.arrowStyle}/> :
-          <i className="fa fa-arrow-up" style={props.arrowStyle}/>) :
+          <i className="fa fa-arrow-up" style={props.arrowStyle}/> :
+          <i className="fa fa-arrow-down" style={props.arrowStyle}/>) :
       ""}
     </th>
   );

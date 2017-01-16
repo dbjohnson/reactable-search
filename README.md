@@ -78,8 +78,8 @@ build|`webpack`
 ```
 $ npm install
 $ webpack
-$ cp -r demo/ dist
-$ cd dist
+$ cd demo
+$ cp ../dist/reactable.js .
 $ webpack-dev-server
 ```
 

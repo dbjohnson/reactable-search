@@ -448,7 +448,7 @@ module.exports =
 	    'th',
 	    { key: props.col, onClick: props.onClick },
 	    props.col,
-	    props.sortBy ? props.sortDesc ? _react2.default.createElement('i', { className: 'fa fa-arrow-down', style: props.arrowStyle }) : _react2.default.createElement('i', { className: 'fa fa-arrow-up', style: props.arrowStyle }) : ""
+	    props.sortBy ? props.sortDesc ? _react2.default.createElement('i', { className: 'fa fa-arrow-up', style: props.arrowStyle }) : _react2.default.createElement('i', { className: 'fa fa-arrow-down', style: props.arrowStyle }) : ""
 	  );
 	};
 
