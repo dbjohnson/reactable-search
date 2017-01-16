@@ -265,12 +265,6 @@ module.exports =
 	  return Cell;
 	}(_react2.default.Component);
 
-	Cell.defaultProps = {
-	  onChange: function onChange(e) {
-	    console.log('Unhandled Cell onChange event:', e);
-	  }
-	};
-
 	var Table = exports.Table = function (_React$Component3) {
 	  (0, _inherits3.default)(Table, _React$Component3);
 

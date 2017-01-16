@@ -59,10 +59,6 @@ class Cell extends React.Component {
 	}		
 }
 
-Cell.defaultProps = {
-	onChange: (e) => { console.log('Unhandled Cell onChange event:', e) }
-}
-
 
 export class Table extends React.Component {
   constructor(props) {
