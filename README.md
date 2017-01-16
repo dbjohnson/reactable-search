@@ -5,6 +5,8 @@ Searchable table with JSON row definitions
 
 
 ![](demo/demo.png)
+[live demo](https://dbjohnson.github.io/reactable/demo)
+
 
 
 ## Description
