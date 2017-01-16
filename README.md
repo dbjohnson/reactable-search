@@ -1,6 +1,9 @@
 # reactable
 Searchable table with JSON row definitions
 
+[![License](https://img.shields.io/github/license/dbjohnson/reactable.svg)]()
+
+
 ![](demo/demo.png)
 
 
