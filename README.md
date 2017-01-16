@@ -20,7 +20,7 @@ Each row definition is a simple JSON object. Each value  specifies a cell in the
 **Cell options**
 
 Key|Description
----+-----------
+---|-----------
 display|display value HTML (can include links, etc)
 sortVal|value by which to sort the cell
 onChange|callback function triggered on value change (cell will be editable if `onChange` is set)
