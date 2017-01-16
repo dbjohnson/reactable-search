@@ -40,14 +40,21 @@ class DemoTable extends React.Component {
 
   render() {
     return (
-        <div style={{margin: "10px"}}>
+        <div style={{margin: "10px", maxWidth:"800px"}}>
           <Reactables.SearchTable
             label="Type to search"
-            rows={this.state.rows}/>
+            rows={this.state.rows}
+            className="table table-bordered table-striped"/>
 
           <hr/> 
-          <h5>Table contents:</h5>
 
+          <div className="row" style={{margin:"auto"}}>
+            <h3 className="col-md-8">Table contents (play around!)</h3>
+            {this.state.error ? 
+              <h3 className="col-md-4"><span className="label label-danger">Invalid JSON</span></h3> :
+              <h3 className="col-md-4"><span className="label label-success">Valid JSON</span></h3> 
+            }
+          </div>
           <textarea 
             rows="20" 
             style={{width: "100%"}} 
@@ -55,10 +62,6 @@ class DemoTable extends React.Component {
             onChange={(e) => this.updateRows(e)}>
           </textarea>
           
-          {this.state.error ? 
-            <h4 style={{color: "red"}}>Invalid JSON</h4> :
-            <h4 style={{color: "limegreen"}}>Valid JSON</h4>
-          }
       </div>
     )
   }

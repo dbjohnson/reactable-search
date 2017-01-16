@@ -370,8 +370,7 @@ module.exports =
 	                    return _this6.setSort(col);
 	                  },
 	                  sortBy: col == sortCol,
-	                  sortDesc: _this6.state.sortDesc
-	                });
+	                  sortDesc: _this6.state.sortDesc });
 	              })
 	            )
 	          ),
@@ -395,7 +394,7 @@ module.exports =
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          { className: 'row', style: { margin: "0px" } },
+	          { className: 'row', style: { margin: "auto" } },
 	          _react2.default.createElement(ExportButton, { format: 'CSV', onClick: function onClick() {
 	              return _this6.dump("table.csv");
 	            } }),
@@ -479,7 +478,7 @@ module.exports =
 
 	SearchBar.defaultProps = {
 	  style: { marginBottom: "10px" },
-	  label: "Search"
+	  label: "Type to search"
 	};
 
 	var ExportButton = function ExportButton(props) {
@@ -518,7 +517,10 @@ module.exports =
 	        _react2.default.createElement(SearchBar, { label: this.props.label, onChange: function onChange(e) {
 	            return _this8.setState({ search: e.target.value });
 	          } }),
-	        _react2.default.createElement(Table, { rows: this.props.rows, search: this.state.search })
+	        _react2.default.createElement(Table, {
+	          rows: this.props.rows,
+	          search: this.state.search,
+	          className: this.props.className })
 	      );
 	    }
 	  }]);
@@ -529,8 +531,7 @@ module.exports =
 
 
 	SearchTable.defaultProps = {
-	  label: "Type to search",
-	  style: { margin: "10px" }
+	  label: "Type to search"
 	};
 
 	module.exports = {

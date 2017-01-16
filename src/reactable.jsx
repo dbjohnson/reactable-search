@@ -144,8 +144,7 @@ export class Table extends React.Component {
                   col={col}
                   onClick={() => this.setSort(col)} 
                   sortBy={col == sortCol}
-                  sortDesc={this.state.sortDesc}
-                  />
+                  sortDesc={this.state.sortDesc}/>
 							)}
             </tr>
           </thead>
@@ -163,7 +162,8 @@ export class Table extends React.Component {
             )}
           </tbody>
         </table>
-        <div className="row" style={{margin: "0px"}}>
+
+        <div className="row" style={{margin: "auto"}}>
           <ExportButton format="CSV" onClick={()=>this.dump("table.csv")}/>
           <ExportButton format="JSON" onClick={()=>this.dump("table.json")}/>
         </div>
@@ -232,7 +232,7 @@ const SearchBar = (props) => {
 
 SearchBar.defaultProps = {
   style: {marginBottom:"10px"},
-  label: "Search"
+  label: "Type to search"
 }
 
 
@@ -259,7 +259,10 @@ export default class SearchTable extends React.Component {
     return (
       <div style={this.props.style}>
         <SearchBar label={this.props.label} onChange={(e) => this.setState({search: e.target.value})}/>
-        <Table rows={this.props.rows} search={this.state.search}/>
+        <Table 
+          rows={this.props.rows} 
+          search={this.state.search}
+          className={this.props.className}/>
       </div>
     );
   }
@@ -267,7 +270,6 @@ export default class SearchTable extends React.Component {
 
 SearchTable.defaultProps = {
   label: "Type to search",
-  style: {margin:"10px"},
 }
 
 module.exports = {
