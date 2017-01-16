@@ -1,0 +1,36 @@
+{
+  "name": "reactable",
+  "description": "React component searchable table",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dbjsonson/reactable.git"
+  },
+  "version": "0.1.0",
+  "dependencies": {
+    "babel-loader": "*",
+    "babel-core": "*",
+    "babel-plugin-transform-runtime": "*",
+    "babel-preset-es2015": "*",
+    "babel-preset-react": "*",
+    "bootstrap": "*",
+    "bootstrap-webpack": "*",
+    "css-loader": "*",
+    "exports-loader": "*",
+    "file-loader": "*",
+    "font-awesome": "*",
+    "font-awesome-webpack": "*",
+    "imports-loader": "*",
+    "jquery": "*",
+    "less": "*",
+    "less-loader": "*",
+    "react": "*",
+    "react-dom": "*",
+    "stacked": "*",
+    "style-loader": "*",
+    "url-loader": "*"
+  },
+  "devDependencies": {
+    "webpack": "*",
+    "webpack-dev-server": "*"
+  }
+}
