@@ -24,7 +24,7 @@ Each row definition is a simple JSON object. Each value  specifies a cell in the
 
 Key|Description
 ---|-----------
-display|display value HTML (can include links, etc)
+display|JSX element or HTML (can include links, etc)
 sortVal|value by which to sort the cell
 onChange|callback function triggered on value change (cell will be editable if `onChange` is set)
 
@@ -38,18 +38,16 @@ var rows = [
 ];
 ```
 
-**Advanced cell definition**
+**Cell definitions with optional attributes**
+
+* Note that each cell can be either plain or rich
+* You can use React components or HTML for display values
 
 ```js
 var rows = [
   {
-    fruit: "apples", 
-    price: 8, 
-    quantity: 3
-  },
-  {
     fruit: {
-      display: "<a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>",
+      display: <label className="label label-danger">bananas</label>,
       sortVal: "bananas",
     },
     price: 5, 
@@ -61,11 +59,14 @@ var rows = [
     quantity: {
       sortVal: 1, 
       display: "I'm editable!", 
-      onChange: "(e) => { console.log('You can watch my changes:', e) }"
+      onChange: (e) => { console.log('You can watch my changes:', e); }
     }
-  }
+  },
+  ...
 ];
 ```
+
+
 
 ## Quickstart
 

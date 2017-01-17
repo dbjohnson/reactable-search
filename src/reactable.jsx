@@ -3,67 +3,90 @@ import ReactDOM from 'react-dom';
 
 
 class ContentEditable extends React.Component {
-	constructor(props) {
-		super(props);
-		this.lastHTML = this.props.html;
-	}
-		
-	render() {
-		return (
-			<div
-				onBlur={(e) => this.emitChange(e)}
-				contentEditable
-				dangerouslySetInnerHTML={{__html: this.props.html}}/>
-		);
-	}
+  constructor(props) {
+    super(props);
+    this.lastHTML = this.props.html;
+  }
 
-	emitChange(e) {
-		var html = e.nativeEvent.target.innerHTML;
+  render() {
+    return (
+      <div
+        onBlur={(e) => this.emitChange(e)}
+        contentEditable
+        dangerouslySetInnerHTML={{__html: this.props.html}}/>
+    );
+  }
+
+  emitChange(e) {
+    var html = e.nativeEvent.target.innerHTML;
     // make sure the value has actually changed before sending any notifications.
     // for example, the user could have just entered the cell then left without
     // changing content - this would still fire the onBlur event
-		if (html !== this.lastHTML) {
-			this.props.onChange(html);
-		}
-		this.lastHTML = html;
-	}
+    if (html !== this.lastHTML) {
+      this.props.onChange(html);
+    }
+    this.lastHTML = html;
+  }
 }
 
 
-class Cell extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			edited: this.props.display
-		}
-	}
+export class Cell extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      edited: props.display
+    }
+  }
 
   render() {
     if (this.props.onChange) {
       return (
-				<td>
-					<ContentEditable
-						html={this.state.edited}
-						onChange={(e) => this.onChange(e)}/>
-				</td>
+        <td>
+          <ContentEditable
+            html={this.state.edited}
+            onChange={(e) => this.onChange(e)}/>
+        </td>
       );
     }
     else {
-      return <td dangerouslySetInnerHTML={{__html: this.props.display}}/>;
+      if (typeof this.props.display === "string") {
+        return <td dangerouslySetInnerHTML={{__html: this.props.display}}/>;
+      }
+      else {
+        return <td>{this.props.display}</td>
+      }
     }
   }
-	
-	onChange(e) {
-		this.setState({edited: e});
+
+  onChange(e) {
+    this.setState({edited: e});
     this.props.onChange(e);
-	}		
+  }
+}
+
+export const Row = (cols, i) => {
+  var cells = [];
+  Object.values(cols).forEach(function(c, j) {
+    cells.push({
+      key: j,
+      sortVal: c.sortVal || c,
+      display: c.display || c,
+      onChange: eval(c.onChange)
+    })
+  })
+
+  return {
+    key: i,
+    cells: cells
+  };
 }
 
 
 export class Table extends React.Component {
   constructor(props) {
     super(props);
-  
+
     this.state = {
       sortBy: this.props.sortBy || Object.keys(this.props.rows[0])[0],
       sortDesc: this.props.sortDesc
@@ -84,81 +107,53 @@ export class Table extends React.Component {
     }
   }
 
-
-  initCells(rows) {
-    // table cells  can either contain raw values that are used for both display and sorting,
-    // or they can contain property definitions for Cell objects, which can 
-    // use different values for sorting vs. display, and can also be editable.
-		// Map default Cell properties for each cell
-		var rows = [];
-		this.props.rows.forEach(function(r, i) {
-			var row = {
-        id: i
-      };
-			Object.keys(r).forEach(function(c, j) {
-				var v = r[c];
-				row[c] = {
-          id: row.id + c + (v.display || v),
-					sortVal: v.sortVal || v.display || v,
-					display: v.display || v,
-          onChange: eval(v.onChange)
-				};
-			});
-			rows.push(row);
-		})
-    return rows;
-  }
-
-
   render() {
+    // coerce the rows to standard format so we can sort and filter them
+    // before the main render block
+    var rows = this.props.rows.map((r, i) => new Row(r, i));
+
+    // sort
     // need local sortCol in case the columns have changed since the last render
     var columns = Object.keys(this.props.rows[0]),
-        sortCol = (columns.indexOf(this.state.sortBy) < 0) ? columns[0] : this.state.sortBy;
+        sortIdx = Math.max(0, columns.indexOf(this.state.sortBy));
 
-    var rows = this.initCells()
-
-		// sort
     rows.sort((a, b) => {
-      var diff = a[sortCol].sortVal > b[sortCol].sortVal; 
+      var diff = a.cells[sortIdx].sortVal > b.cells[sortIdx].sortVal;
       return this.state.sortDesc ? !diff : diff;
     });
 
 
-		// filter
+    // filter
     var searchTokens = this.props.search.split(/[ ,]+/),
         regexes = searchTokens.map(st => new RegExp(st, 'gi')),
-        filtered = rows.filter(r =>
+        filtered = rows.filter(row =>
           regexes.every(re =>
-            columns.some(c =>
-              String(r[c].display).match(re))));
+            row.cells.some(c =>
+              String(c.display).match(re))));
 
-		// render
+    // render
     return (
       <div style={this.props.style}>
         <table className={this.props.className}>
           <thead>
             <tr>{
-							columns.map((col) =>
+              columns.map((col, j) =>
                 <TableHeader
                   key={col}
                   col={col}
-                  onClick={() => this.setSort(col)} 
-                  sortBy={col == sortCol}
+                  onClick={() => this.setSort(col)}
+                  sortBy={j == sortIdx}
                   sortDesc={this.state.sortDesc}/>
-							)}
+              )}
             </tr>
           </thead>
           <tbody>{
             filtered.map((row) =>
-							<tr key={row.id}>{
-								columns.map((c) =>
-									<Cell 
-										key={row[c].id}
-                    sortVal={row[c].sortVal}
-										display={row[c].display} 
-                    onChange={row[c].onChange}/>
-								)}
-							</tr>
+              <tr key={row.key}>{
+                row.cells.map((col, j) =>
+                  React.createElement(Cell, col))
+              }
+              </tr>
             )}
           </tbody>
         </table>
@@ -172,7 +167,7 @@ export class Table extends React.Component {
   }
 
   dump(filename) {
-    var blob = null, 
+    var blob = null,
         a = document.createElement('a');
 
     if (filename.endsWith('csv')) {
@@ -238,11 +233,11 @@ SearchBar.defaultProps = {
 
 const ExportButton = (props) => {
   return (
-    <button 
+    <button
       type="button"
       className="btn btn-primary"
       onClick={props.onClick}
-      style={{marginRight: "2px"}}>
+      style={{marginRight: "5px"}}>
       Export to {props.format}
     </button>
   );
@@ -259,8 +254,8 @@ export default class SearchTable extends React.Component {
     return (
       <div style={this.props.style}>
         <SearchBar label={this.props.label} onChange={(e) => this.setState({search: e.target.value})}/>
-        <Table 
-          rows={this.props.rows} 
+        <Table
+          rows={this.props.rows}
           search={this.state.search}
           className={this.props.className}/>
       </div>
@@ -273,5 +268,5 @@ SearchTable.defaultProps = {
 }
 
 module.exports = {
-  SearchTable, Table
+  SearchTable, Table, Cell
 };

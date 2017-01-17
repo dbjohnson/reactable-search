@@ -1,12 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Reactables from './reactable.js';
+import {SearchTable} from './reactable.js';
+import {Cell} from './reactable.js';
 
 
 var init = [
   {
-    fruit: "apples", 
-    price: 8, 
+    fruit: {
+      sortVal: 3,
+      display: 'apples'
+    },
+    price: 8,
     quantity: 3
   },
   {
@@ -14,19 +18,33 @@ var init = [
       display: "<a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>",
       sortVal: "bananas",
     },
-    price: 5, 
+    price: 5,
     quantity: 2
   },
   {
-    fruit: "grapes", 
-    price: 2, 
+    fruit: "grapes",
+    price: 2,
     quantity: {
-      sortVal: 1, 
-      display: "I'm editable!", 
+      sortVal: 1,
+      display: "I'm editable!",
       onChange: "(e) => { console.log('You can watch my changes:', e) }"
     }
   }
 ];
+
+
+class ExpandableRow extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      expanded: false
+    }
+  }
+
+  render() {
+
+  }
+}
 
 class DemoTable extends React.Component {
   constructor(props) {
@@ -41,27 +59,27 @@ class DemoTable extends React.Component {
   render() {
     return (
         <div style={{margin: "10px", maxWidth:"800px"}}>
-          <Reactables.SearchTable
+          <SearchTable
             label="Type to search"
             rows={this.state.rows}
             className="table table-bordered table-striped"/>
 
-          <hr/> 
+          <hr/>
 
-          <div className="row" style={{margin:"auto"}}>
+          <div className="row" style={{margin:"auto", }}>
             <h3 className="col-md-8">Table contents (play around!)</h3>
-            {this.state.error ? 
+            {this.state.error ?
               <h3 className="col-md-4"><span className="label label-danger">Invalid JSON</span></h3> :
-              <h3 className="col-md-4"><span className="label label-success">Valid JSON</span></h3> 
+              <h3 className="col-md-4"><span className="label label-success">Valid JSON</span></h3>
             }
           </div>
-          <textarea 
-            rows="20" 
-            style={{width: "100%"}} 
+          <textarea
+            rows="20"
+            style={{width: "100%"}}
             value={this.state.value}
             onChange={(e) => this.updateRows(e)}>
           </textarea>
-          
+
       </div>
     )
   }
@@ -77,13 +95,13 @@ class DemoTable extends React.Component {
       });
 
       this.setState({
-        rows: rows, 
+        rows: rows,
         error: false
       });
     }
     catch (e) {
       this.setState({error: true})
-    } 
+    }
   }
 };
 
