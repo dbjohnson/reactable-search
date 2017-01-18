@@ -36,8 +36,28 @@ $ webpack-dev-server
 
 ## Usage
 
-###Rows
-Each row can be either a simple JSON object where `key:value` specifies `colname:display`, or contain separate keys for `cells` and `children` for rows that are dynamically expandable.  The value under the `cells` key should be a simple row definition; the value under the `children` key should be a list of child rows.  Note that child rows do not have to share the same columns as parent rows, allowing arbitary DOM to be appended to each row [see demo](https://dbjohnson.github.io/reactable/demo).
+### Basic example
+
+``` js
+import Reactables from './reactable.js';
+import ReactDOM from 'react-dom';
+
+var rows = [
+  {a: 1, b: 2},
+  {a: 2, b: 3},
+  ...
+];
+
+ReactDOM.render(
+  <Reactables.SearchTable
+    label="Type to search"
+    rows={rows}/>,
+  document.getElementByID("root");
+```
+
+
+###Row details
+Each row can be either a simple JSON object where `key:value` specifies `colname:display`, or contain separate keys for `cells` and `children` for rows that are dynamically expandable.  The value under the `cells` key should be a simple row definition; the value under the `children` key should be a list of child rows.  Note that child rows do not have to share the same columns as parent rows, allowing arbitary DOM to be appended to each row -[see demo](https://dbjohnson.github.io/reactable/demo).
 
 ####Simple row example
 
@@ -64,7 +84,7 @@ var expandableRows = [
 ];
 ```
 
-### Cells
+### Cell details
 
 Similar to rows, cell definition may be any valid DOM, or a contain a "rich" definition allowing optional specification of separate values for sorting vs. display, and an `onChange` callback function, which if provided will make the cell editable.
 
@@ -87,27 +107,6 @@ var rows = [
 ];
 ```
 
-
-## Complete example
-
-``` js
-import Reactables from './reactable.js';
-import ReactDOM from 'react-dom';
-
-var rows = [
-  {a: 1, b: 2},
-  {a: 2, b: 3},
-  ...
-];
-
-ReactDOM.render(
-  <Reactables.SearchTable
-    label="Type to search"
-    rows={rows}/>,
-  document.getElementByID("root");
-```
-
-
 ## Disclaimer
 Please be gentle, this is my first React project, my first webpack project, and my first node project.  I'm sure there are many things that should have been differently - please leave feedback!
 
@@ -116,7 +115,6 @@ Please be gentle, this is my first React project, my first webpack project, and 
 * Publish to npm
 * figure out modular styling in React
 * Gather feedback on organization, etc - please leave an issue if you see something obvious!
-
 
 
 ## Inspiration
