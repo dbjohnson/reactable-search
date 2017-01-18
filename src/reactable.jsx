@@ -42,19 +42,21 @@ export class Cell extends React.Component {
   render() {
     if (this.props.onChange) {
       return (
-        <td>
+        <td style={this.props.style}>
           <ContentEditable
             html={this.state.edited}
-            onChange={(e) => this.onChange(e)}/>
+            onChange={(e) => this.props.onChange(e)}/>
         </td>
       );
     }
     else {
       if (typeof this.props.display === "string") {
-        return <td dangerouslySetInnerHTML={{__html: this.props.display}}/>;
+        return <td
+                style={this.props.style}
+                dangerouslySetInnerHTML={{__html: this.props.display}}/>;
       }
       else {
-        return <td>{this.props.display}</td>
+        return <td style={this.props.style}>{this.props.display}</td>
       }
     }
   }
@@ -65,21 +67,90 @@ export class Cell extends React.Component {
   }
 }
 
-export const Row = (cols, i) => {
-  var cells = [];
-  Object.values(cols).forEach(function(c, j) {
-    cells.push({
-      key: j,
-      sortVal: c.sortVal || c,
-      display: c.display || c,
-      onChange: eval(c.onChange)
-    })
+const CoerceCells = (cells) => {
+  var coerced = {};
+  Object.keys(cells).forEach(function(c, j) {
+    var cell = cells[c];
+    coerced[c] = {
+      sortVal: cell.sortVal || cell,
+      display: cell.display  || cell,
+      onChange: cell.onChange
+    };
   })
+  return coerced;
+}
 
+
+const CoerceRow = (row, key) => {
   return {
-    key: i,
-    cells: cells
-  };
+    key: key,
+    children: row.children || [],
+    expanded: false,
+    cells: CoerceCells(row.cells)
+  }
+}
+
+
+class Row extends React.Component {
+  renderExpander() {
+    if (this.props.expanderCol) {
+      if (this.props.expanderBtn) {
+        return (
+          <td style={{width: "30px"}}>
+            <ExpanderButton
+              onClick={(expanded) => {
+                this.props.onExpand(expanded);
+              }}/>
+          </td>
+        );
+      }
+      else {
+        return <td/>
+      }
+    }
+  }
+
+  render() {
+    return (
+      <tr>{this.renderExpander()}
+        {
+        Object.values(this.props.cells).map((c, j) =>
+          <Cell
+            key={j}
+            display={c.display}
+            onChange={c.onChange}
+          />
+        )
+      }</tr>
+    );
+  }
+}
+
+class ExpanderButton extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      expanded: false
+    }
+  }
+
+  toggle() {
+    this.setState({
+      expanded: !this.state.expanded
+    })
+    this.props.onClick(!this.state.expanded);
+  }
+
+  render() {
+    return (
+        <button
+          className="btn btn-primary btn-xs"
+          style={{width:"22px"}} // keep button from changing width between +/-
+          onClick={() => this.toggle()}>
+          {this.state.expanded ? "-" : "+"}
+        </button>
+    );
+  }
 }
 
 
@@ -87,13 +158,28 @@ export class Table extends React.Component {
   constructor(props) {
     super(props);
 
+    this.columns = Object.keys(props.rows[0].cells),
+    // if any of the rows are expandable, add an extra column header at the left
+    this.expandable = props.rows.some(r => r.children);
+    if (this.expandable) {
+      this.columns.unshift('');
+    }
+
     this.state = {
-      sortBy: this.props.sortBy || Object.keys(this.props.rows[0])[0],
-      sortDesc: this.props.sortDesc
+      sortBy: this.props.sortBy || Object.keys(this.props.rows[0].cells)[0],
+      sortDesc: this.props.sortDesc,
+      // This is pretty goofy - since I want to be able to have expandable rows,
+      // I need to keep track of each row's expanded state on the table, since
+      // I can't render the expanded child directly from the row component :|
+      // Surely there's a better way, but I can't find it
+      rows: this.props.rows.map((r, i) => CoerceRow(r, i))
     };
   }
 
   setSort(col) {
+    if (col == '') {
+      return
+    }
     if (this.state.sortBy == col) {
       this.setState({
         sortDesc: !this.state.sortDesc
@@ -107,55 +193,73 @@ export class Table extends React.Component {
     }
   }
 
-  render() {
-    // coerce the rows to standard format so we can sort and filter them
-    // before the main render block
-    var rows = this.props.rows.map((r, i) => new Row(r, i));
-
-    // sort
-    // need local sortCol in case the columns have changed since the last render
-    var columns = Object.keys(this.props.rows[0]),
-        sortIdx = Math.max(0, columns.indexOf(this.state.sortBy));
-
-    rows.sort((a, b) => {
-      var diff = a.cells[sortIdx].sortVal > b.cells[sortIdx].sortVal;
+  sort() {
+    this.state.rows.sort((a, b) => {
+      var diff = a.cells[this.state.sortBy].sortVal > b.cells[this.state.sortBy].sortVal;
       return this.state.sortDesc ? !diff : diff;
     });
+  }
 
-
-    // filter
+  filter() {
     var searchTokens = this.props.search.split(/[ ,]+/),
         regexes = searchTokens.map(st => new RegExp(st, 'gi')),
-        filtered = rows.filter(row =>
+        filtered = this.state.rows.filter(row =>
           regexes.every(re =>
-            row.cells.some(c =>
-              String(c.display).match(re))));
+            Object.keys(this.state.rows[0].cells).some(c =>
+              String(row.cells[c].display).match(re))));
+    return filtered
+  }
 
-    // render
+  expand(filtered) {
+    // handle expanded rows
+    var rows = [];
+    filtered.forEach(function(r) {
+      rows.push(r)
+      if (r.expanded) {
+        rows = rows.concat(r.children)
+      }
+    });
+    return rows;
+  }
+
+  render() {
+    this.sort();
+    var rows = this.expand(this.filter());
+
     return (
       <div style={this.props.style}>
         <table className={this.props.className}>
           <thead>
             <tr>{
-              columns.map((col, j) =>
+              this.columns.map(col =>
                 <TableHeader
                   key={col}
                   col={col}
                   onClick={() => this.setSort(col)}
-                  sortBy={j == sortIdx}
-                  sortDesc={this.state.sortDesc}/>
-              )}
-            </tr>
+                  sortBy={col == this.state.sortBy}
+                  sortDesc={this.state.sortDesc}/>)
+            }</tr>
           </thead>
           <tbody>{
-            filtered.map((row) =>
-              <tr key={row.key}>{
-                row.cells.map((col, j) =>
-                  React.createElement(Cell, col))
-              }
-              </tr>
-            )}
-          </tbody>
+            rows.map((r, i) =>
+              this.state.rows.indexOf(r) >= 0 ?
+                <Row
+                  key={r.key}
+                  cells={r.cells}
+                  expanderCol={this.expandable}
+                  expanderBtn={r.children.length}
+                  onExpand={
+                    (ex) => {
+                      r.expanded = ex;
+                      this.setState({rows: this.state.rows})
+                    }
+                  }
+                /> :
+                <tr key={this.state.rows.length + i}>
+                  <td colSpan={this.columns.length}>{r}</td>
+                </tr>
+            )
+          }</tbody>
         </table>
 
         <div className="row" style={{margin: "auto"}}>
@@ -171,8 +275,8 @@ export class Table extends React.Component {
         a = document.createElement('a');
 
     if (filename.endsWith('csv')) {
-      var cols = Object.keys(this.props.rows[0]),
-          dataRows = this.props.rows.map(r => cols.map(c => r[c].display || r[c])),
+      var cols = Object.keys(this.state.rows[0].cells),
+          dataRows = this.state.rows.map(r => cols.map(c => r.cells[c].display || r[c])),
           rows = [cols].concat(dataRows),
           csv = rows.map(r => r.join(',')).join('\n');
 
@@ -235,7 +339,7 @@ const ExportButton = (props) => {
   return (
     <button
       type="button"
-      className="btn btn-primary"
+      className="btn btn-primary btn-sm"
       onClick={props.onClick}
       style={{marginRight: "5px"}}>
       Export to {props.format}
@@ -268,5 +372,5 @@ SearchTable.defaultProps = {
 }
 
 module.exports = {
-  SearchTable, Table, Cell
+  SearchTable, Table
 };

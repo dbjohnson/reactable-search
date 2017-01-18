@@ -70,17 +70,16 @@ var rows = [
 
 ## Quickstart
 
-task|command
-----|-----
-install dependencies|`npm install`
-build|`webpack`
+```bash
+$ npm install
+$ webpack
+```
 
 ### Run demo
 ```
 $ npm install
-$ webpack
+$ webpack --output-target=demo
 $ cd demo
-$ cp ../dist/reactable.js .
 $ webpack-dev-server
 ```
 
