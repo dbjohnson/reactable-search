@@ -339,7 +339,7 @@ export class Table extends React.Component {
 Table.defaultProps = {
   className: "table table-bordered table-striped",
   search: "",
-  showExportBtn: true
+  showExportBtn: false
 };
 
 
@@ -414,7 +414,7 @@ export default class SearchTable extends React.Component {
 
 SearchTable.defaultProps = {
   searchPrompt: "Type to search",
-  showExportBtn: true
+  showExportBtn: false
 }
 
 module.exports = {

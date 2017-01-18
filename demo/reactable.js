@@ -616,7 +616,7 @@ module.exports =
 	Table.defaultProps = {
 	  className: "table table-bordered table-striped",
 	  search: "",
-	  showExportBtn: true
+	  showExportBtn: false
 	};
 
 	var TableHeader = function TableHeader(props) {
@@ -710,7 +710,7 @@ module.exports =
 
 	SearchTable.defaultProps = {
 	  searchPrompt: "Type to search",
-	  showExportBtn: true
+	  showExportBtn: false
 	};
 
 	module.exports = {
