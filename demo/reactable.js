@@ -341,8 +341,9 @@ module.exports =
 	            "td",
 	            { style: { width: "30px" } },
 	            _react2.default.createElement(ExpanderButton, {
-	              onClick: function onClick(expanded) {
-	                _this6.props.onExpand(expanded);
+	              expanded: this.props.expanded,
+	              onClick: function onClick() {
+	                _this6.props.onExpand(!_this6.props.expanded);
 	              } })
 	          );
 	        } else {
@@ -376,26 +377,12 @@ module.exports =
 	var ExpanderButton = function (_React$Component4) {
 	  (0, _inherits3.default)(ExpanderButton, _React$Component4);
 
-	  function ExpanderButton(props) {
+	  function ExpanderButton() {
 	    (0, _classCallCheck3.default)(this, ExpanderButton);
-
-	    var _this8 = (0, _possibleConstructorReturn3.default)(this, (ExpanderButton.__proto__ || (0, _getPrototypeOf2.default)(ExpanderButton)).call(this, props));
-
-	    _this8.state = {
-	      expanded: false
-	    };
-	    return _this8;
+	    return (0, _possibleConstructorReturn3.default)(this, (ExpanderButton.__proto__ || (0, _getPrototypeOf2.default)(ExpanderButton)).apply(this, arguments));
 	  }
 
 	  (0, _createClass3.default)(ExpanderButton, [{
-	    key: "toggle",
-	    value: function toggle() {
-	      this.setState({
-	        expanded: !this.state.expanded
-	      });
-	      this.props.onClick(!this.state.expanded);
-	    }
-	  }, {
 	    key: "render",
 	    value: function render() {
 	      var _this9 = this;
@@ -406,9 +393,9 @@ module.exports =
 	          className: "btn btn-primary btn-xs",
 	          style: { width: "22px" } // keep button from changing width between +/-
 	          , onClick: function onClick() {
-	            return _this9.toggle();
+	            return _this9.props.onClick();
 	          } },
-	        this.state.expanded ? "-" : "+"
+	        this.props.expanded ? "-" : "+"
 	      );
 	    }
 	  }]);
@@ -563,6 +550,7 @@ module.exports =
 	                key: r.key,
 	                cells: r.cells,
 	                tableWidthCols: _this13.columns.length,
+	                expanded: r.expanded,
 	                expanderCol: _this13.expandable,
 	                expanderBtn: r.children.length > 0,
 	                onExpand: function onExpand(ex) {

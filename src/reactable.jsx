@@ -123,8 +123,9 @@ class Row extends React.Component {
         return (
           <td style={{width: "30px"}}>
             <ExpanderButton
-              onClick={(expanded) => {
-                this.props.onExpand(expanded);
+              expanded={this.props.expanded}
+              onClick={() => {
+                this.props.onExpand(!this.props.expanded);
               }}/>
           </td>
         );
@@ -157,27 +158,13 @@ class Row extends React.Component {
 }
 
 class ExpanderButton extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      expanded: false
-    }
-  }
-
-  toggle() {
-    this.setState({
-      expanded: !this.state.expanded
-    })
-    this.props.onClick(!this.state.expanded);
-  }
-
   render() {
     return (
         <button
           className="btn btn-primary btn-xs"
           style={{width:"22px"}} // keep button from changing width between +/-
-          onClick={() => this.toggle()}>
-          {this.state.expanded ? "-" : "+"}
+          onClick={() => this.props.onClick()}>
+          {this.props.expanded ? "-" : "+"}
         </button>
     );
   }
@@ -295,6 +282,7 @@ export class Table extends React.Component {
                 key={r.key}
                 cells={r.cells}
                 tableWidthCols={this.columns.length}
+                expanded={r.expanded}
                 expanderCol={this.expandable}
                 expanderBtn={r.children.length > 0}
                 onExpand={
