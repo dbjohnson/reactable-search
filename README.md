@@ -9,64 +9,14 @@ Searchable table with JSON row definitions
 [live demo](https://dbjohnson.github.io/reactable/demo)
 
 
-
 ## Description
-This React component is a simple live-searchable table with support for some basic enhancements:
+This React component is a simple live-searchable table with some basic enhancements:
 
 * Regex search
 * Optionally editable cells with callback
 * Optional separate values for display vs. sort
 * Export to CSV and JSON
-
-Each row definition is a simple JSON object. Each value  specifies a cell in the table, may either be a plain text / number object, or a map describing optional parameters:
-
-**Cell options**
-
-Key|Description
----|-----------
-display|JSX element or HTML (can include links, etc)
-sortVal|value by which to sort the cell
-onChange|callback function triggered on value change (cell will be editable if `onChange` is set)
-
-**Simple row definition**
-
-```js
-var rows = [
-	{a: 1, b: 2},
-	{a: 2, b: 3},
-	...
-];
-```
-
-**Cell definitions with optional attributes**
-
-* Note that each cell can be either plain or rich
-* You can use React components or HTML for display values
-
-```js
-var rows = [
-  {
-    fruit: {
-      display: <label className="label label-danger">bananas</label>,
-      sortVal: "bananas",
-    },
-    price: 5, 
-    quantity: 2
-  },
-  {
-    fruit: "grapes", 
-    price: 2, 
-    quantity: {
-      sortVal: 1, 
-      display: "I'm editable!", 
-      onChange: (e) => { console.log('You can watch my changes:', e); }
-    }
-  },
-  ...
-];
-```
-
-
+* Expandable rows
 
 ## Quickstart
 
@@ -84,18 +34,70 @@ $ webpack-dev-server
 ```
 
 
+## Usage
+
+###Rows
+Each row can be either a simple JSON object where `key:value` specifies `colname:display`, or contain separate keys for `cells` and `children` for rows that are dynamically expandable.  The value under the `cells` key should be a simple row definition; the value under the `children` key should be a list of child rows.  Note that child rows do not have to share the same columns as parent rows, allowing arbitary DOM to be appended to each row [see demo](https://dbjohnson.github.io/reactable/demo).
+
+####Simple row example
+
+```js
+var rows = [
+  {{a: 1, b: 2}},
+  {a: 2, b: 3},
+  ...
+];
+```
+
+####Exapandable row example
+
+```js
+var expandableRows = [
+  {
+    cells: {a: 1, b: 2}}
+    children: [{
+      cells: {c: 'x'},
+      children: []
+    }, 
+  }, 
+  ...
+];
+```
+
+### Cells
+
+Similar to rows, cell definition may be any valid DOM, or a contain a "rich" definition allowing optional specification of separate values for sorting vs. display, and an `onChange` callback function, which if provided will make the cell editable.
+
+#### Simple cell example
+All examples in the [row section](#rows) use simple cell definitions.
+
+#### Rich cell example
+```js
+var rows = [
+  {
+    cells: {
+      fruit: {
+        display: <label className="label label-danger">bananas</label>,
+        sortVal: "bananas",
+        onChange: (e) => { console.log('You can watch my changes:', e) }
+      },
+      price: 5, 
+      quantity: 2
+  }
+];
+```
 
 
-## Example usage
+## Complete example
 
 ``` js
 import Reactables from './reactable.js';
 import ReactDOM from 'react-dom';
 
 var rows = [
-	{a: 1, b: 2},
-	{a: 2, b: 3},
-	...
+  {a: 1, b: 2},
+  {a: 2, b: 3},
+  ...
 ];
 
 ReactDOM.render(

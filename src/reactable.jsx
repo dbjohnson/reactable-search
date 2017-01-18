@@ -102,7 +102,7 @@ const CoerceRow = (row) => {
   return {
     children: (row.children || []).map(c => CoerceRow(c)),
     expanded: false,
-    cells: CoerceCells(row.cells)
+    cells: CoerceCells(row.cells || row)
   }
 }
 
