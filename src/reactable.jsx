@@ -1,5 +1,5 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
 
 class ContentEditable extends React.Component {
@@ -42,7 +42,10 @@ export class Cell extends React.Component {
   render() {
     if (this.props.onChange) {
       return (
-        <td style={this.props.style}>
+        <td
+          style={this.props.style}
+          colSpan={this.props.colSpan}
+          rowSpan={this.props.rowSpan}>
           <ContentEditable
             html={this.state.edited}
             onChange={(e) => this.props.onChange(e)}/>
@@ -53,10 +56,19 @@ export class Cell extends React.Component {
       if (typeof this.props.display === "string") {
         return <td
                 style={this.props.style}
+                colSpan={this.props.colSpan}
+                rowSpan={this.props.rowSpan}
                 dangerouslySetInnerHTML={{__html: this.props.display}}/>;
       }
       else {
-        return <td style={this.props.style}>{this.props.display}</td>
+        return (
+          <td
+            style={this.props.style}
+            colSpan={this.props.colSpan}
+            rowSpan={this.props.rowSpan}>
+            {this.props.display}
+          </td>
+        );
       }
     }
   }
@@ -65,6 +77,11 @@ export class Cell extends React.Component {
     this.setState({edited: e});
     this.props.onChange(e);
   }
+}
+
+Cell.defaultProperties = {
+  colSpan: 1,
+  rowSpan: 1
 }
 
 const CoerceCells = (cells) => {
@@ -81,10 +98,9 @@ const CoerceCells = (cells) => {
 }
 
 
-const CoerceRow = (row, key) => {
+const CoerceRow = (row) => {
   return {
-    key: key,
-    children: row.children || [],
+    children: (row.children || []).map(c => CoerceRow(c)),
     expanded: false,
     cells: CoerceCells(row.cells)
   }
@@ -92,6 +108,15 @@ const CoerceRow = (row, key) => {
 
 
 class Row extends React.Component {
+  constructor(props) {
+    super(props)
+
+    // Child rows may not have the same column set as top-level rows.
+    // When this is the case, adjust the colspan to automatically distribute
+    // cells across the entire table width
+    this.colSpan = this.props.tableWidthCols / Object.keys(this.props.cells).length
+  }
+
   renderExpander() {
     if (this.props.expanderCol) {
       if (this.props.expanderBtn) {
@@ -112,16 +137,21 @@ class Row extends React.Component {
 
   render() {
     return (
-      <tr>{this.renderExpander()}
+      <tr>
         {
-        Object.values(this.props.cells).map((c, j) =>
-          <Cell
-            key={j}
-            display={c.display}
-            onChange={c.onChange}
-          />
-        )
-      }</tr>
+          this.renderExpander()
+        }
+        {
+          Object.values(this.props.cells).map((c, j) =>
+            <Cell
+              key={j}
+              display={c.display}
+              onChange={c.onChange}
+              colSpan={this.colSpan}
+            />
+          )
+        }
+      </tr>
     );
   }
 }
@@ -154,6 +184,19 @@ class ExpanderButton extends React.Component {
 }
 
 
+const expandRows = (rows, force) => {
+  // recursively expand any collapsed rows
+  var expanded = [];
+  rows.forEach(function(r) {
+    expanded.push(r)
+    if (r.expanded || force) {
+      expanded = expanded.concat(expandRows(r.children))
+    }
+  });
+  return expanded;
+}
+
+
 export class Table extends React.Component {
   constructor(props) {
     super(props);
@@ -162,22 +205,30 @@ export class Table extends React.Component {
     // if any of the rows are expandable, add an extra column header at the left
     this.expandable = props.rows.some(r => r.children);
     if (this.expandable) {
-      this.columns.unshift('');
+      this.columns.unshift("");
     }
+
+    // coerce all row definitions to standard format
+    var coercedRows = this.props.rows.map(r => CoerceRow(r))
+
+    // recursively expand any collapsed rows and assign unique indexes
+    expandRows(coercedRows, true).forEach(function(r, i) {
+      r.key = i;
+    });
 
     this.state = {
       sortBy: this.props.sortBy || Object.keys(this.props.rows[0].cells)[0],
       sortDesc: this.props.sortDesc,
       // This is pretty goofy - since I want to be able to have expandable rows,
-      // I need to keep track of each row's expanded state on the table, since
-      // I can't render the expanded child directly from the row component :|
+      // I need to keep track of each row"s expanded state on the table, since
+      // I can"t render the expanded child directly from the row component :|
       // Surely there's a better way, but I can't find it
-      rows: this.props.rows.map((r, i) => CoerceRow(r, i))
+      rows: coercedRows
     };
   }
 
   setSort(col) {
-    if (col == '') {
+    if (col == "") {
       return
     }
     if (this.state.sortBy == col) {
@@ -194,38 +245,38 @@ export class Table extends React.Component {
   }
 
   sort() {
-    this.state.rows.sort((a, b) => {
+    return this.state.rows.sort((a, b) => {
       var diff = a.cells[this.state.sortBy].sortVal > b.cells[this.state.sortBy].sortVal;
       return this.state.sortDesc ? !diff : diff;
     });
   }
 
-  filter() {
+  filter(rows) {
     var searchTokens = this.props.search.split(/[ ,]+/),
-        regexes = searchTokens.map(st => new RegExp(st, 'gi')),
-        filtered = this.state.rows.filter(row =>
+        regexes = searchTokens.map(st => new RegExp(st, "gi")),
+        filtered = rows.filter(row =>
           regexes.every(re =>
-            Object.keys(this.state.rows[0].cells).some(c =>
-              String(row.cells[c].display).match(re))));
+            Object.values(row.cells).some(c =>
+              String(c.display).match(re))));
     return filtered
   }
 
-  expand(filtered) {
-    // handle expanded rows
-    var rows = [];
-    filtered.forEach(function(r) {
-      rows.push(r)
-      if (r.expanded) {
-        rows = rows.concat(r.children)
-      }
-    });
-    return rows;
+  displayedRows() {
+    return this.filter(expandRows(this.sort()));
+  }
+
+  renderExportButtons() {
+    if (this.props.showExportBtn) {
+      return (
+        <div className="row" style={{margin: "auto"}}>
+          <ExportButton format="CSV" onClick={()=>this.exportFile("table.csv")}/>
+          <ExportButton format="JSON" onClick={()=>this.exportFile("table.json")}/>
+        </div>
+      );
+    }
   }
 
   render() {
-    this.sort();
-    var rows = this.expand(this.filter());
-
     return (
       <div style={this.props.style}>
         <table className={this.props.className}>
@@ -241,49 +292,46 @@ export class Table extends React.Component {
             }</tr>
           </thead>
           <tbody>{
-            rows.map((r, i) =>
-              this.state.rows.indexOf(r) >= 0 ?
-                <Row
-                  key={r.key}
-                  cells={r.cells}
-                  expanderCol={this.expandable}
-                  expanderBtn={r.children.length}
-                  onExpand={
-                    (ex) => {
-                      r.expanded = ex;
-                      this.setState({rows: this.state.rows})
-                    }
+            this.displayedRows().map(r =>
+              <Row
+                key={r.key}
+                cells={r.cells}
+                tableWidthCols={this.columns.length - (this.expandable ? 1 : 0)}
+                expanderCol={this.expandable}
+                expanderBtn={r.children.length > 0}
+                onExpand={
+                  (ex) => {
+                    r.expanded = ex;
+                    this.setState({rows: this.state.rows})
                   }
-                /> :
-                <tr key={this.state.rows.length + i}>
-                  <td colSpan={this.columns.length}>{r}</td>
-                </tr>
+                }
+              />
             )
           }</tbody>
         </table>
 
-        <div className="row" style={{margin: "auto"}}>
-          <ExportButton format="CSV" onClick={()=>this.dump("table.csv")}/>
-          <ExportButton format="JSON" onClick={()=>this.dump("table.json")}/>
-        </div>
+        {this.renderExportButtons()}
       </div>
     );
   }
 
-  dump(filename) {
+  exportFile(filename) {
     var blob = null,
-        a = document.createElement('a');
+        a = document.createElement("a");
 
-    if (filename.endsWith('csv')) {
-      var cols = Object.keys(this.state.rows[0].cells),
-          dataRows = this.state.rows.map(r => cols.map(c => r.cells[c].display || r[c])),
+    if (filename.endsWith("csv")) {
+      var cols = this.expandable ? this.columns.slice(1) : this.columns,
+          validRows = this.displayedRows().filter(r => Object.keys(r.cells).join(",") == cols.join(",")),
+          dataRows = validRows.map(r => cols.map(c => r.cells[c].display)),
           rows = [cols].concat(dataRows),
-          csv = rows.map(r => r.join(',')).join('\n');
+          csv = rows.map(r => r.join(",")).join("\n");
 
-      blob = new Blob([csv], {type: 'text/csv'});
+      console.log(validRows.length, cols, Object.keys(this.displayedRows()[0].cells))
+
+      blob = new Blob([csv], {type: "text/csv"});
     }
     else {
-      blob = new Blob([JSON.stringify(this.props.rows, null, 2)], {type: 'text/json'});
+      blob = new Blob([JSON.stringify(this.props.rows, null, 2)], {type: "text/json"});
     }
 
     a.download = filename;
@@ -295,7 +343,8 @@ export class Table extends React.Component {
 
 Table.defaultProps = {
   className: "table table-bordered table-striped",
-  search: ""
+  search: "",
+  showExportBtn: true
 };
 
 
@@ -330,7 +379,6 @@ const SearchBar = (props) => {
 };
 
 SearchBar.defaultProps = {
-  style: {marginBottom:"10px"},
   label: "Type to search"
 }
 
@@ -351,17 +399,14 @@ const ExportButton = (props) => {
 export default class SearchTable extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {search: ''};
+    this.state = {search: ""};
   }
 
   render() {
     return (
       <div style={this.props.style}>
         <SearchBar label={this.props.label} onChange={(e) => this.setState({search: e.target.value})}/>
-        <Table
-          rows={this.props.rows}
-          search={this.state.search}
-          className={this.props.className}/>
+        {React.createElement(Table, this.props)}
       </div>
     );
   }

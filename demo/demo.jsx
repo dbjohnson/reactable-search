@@ -15,7 +15,11 @@ var rows = [
       price: 8,
       quantity: 3
     },
-    children: [<img src={nyancat} style={{display: "block", margin: "auto"}}/>],
+    children: [{
+      cells: {
+        gif: <img src={nyancat} style={{display: "block", margin: "auto"}}/>
+      }},
+    ]
   },
   {
     cells: {
@@ -47,6 +51,7 @@ const DemoTable = (props) => {
       <SearchTable
         label="Type to search"
         rows={rows}
+        showExportBtn={true}
         className="table table-bordered table-striped"/>
     </div>
   )
