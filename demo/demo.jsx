@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import {SearchTable} from './reactable.js';
 
 
-var nyancat = "http://media.riffsy.com/images/806fa85fc55a55de66ab310e500b5f0f/raw";
+var applegif = "http://i.giphy.com/wJRhcjWc7fKIE.gif";
 
 var rows = [
   {
@@ -17,7 +17,7 @@ var rows = [
     },
     children: [{
       cells: {
-        gif: <img src={nyancat} style={{display: "block", margin: "auto"}}/>
+        gif: <img src={applegif} style={{display: "block", margin: "auto"}}/>
       }},
     ]
   },
@@ -49,8 +49,8 @@ const DemoTable = (props) => {
   return (
     <div style={{margin: "10px", maxWidth:"800px"}}>
       <SearchTable
-        label="Type to search"
         rows={rows}
+        searchPrompt="Type to search"
         showExportBtn={true}
         className="table table-bordered table-striped"/>
     </div>

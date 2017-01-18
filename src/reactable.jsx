@@ -201,36 +201,31 @@ export class Table extends React.Component {
   constructor(props) {
     super(props);
 
-    this.columns = Object.keys(props.rows[0].cells),
-    // if any of the rows are expandable, add an extra column header at the left
-    this.expandable = props.rows.some(r => r.children);
-    if (this.expandable) {
-      this.columns.unshift("");
-    }
-
     // coerce all row definitions to standard format
-    var coercedRows = this.props.rows.map(r => CoerceRow(r))
+    var coercedRows = props.rows.map(r => CoerceRow(r))
+
+    // see if any rows are expandable
+    this.expandable = coercedRows.some(r => r.children.length)
 
     // recursively expand any collapsed rows and assign unique indexes
     expandRows(coercedRows, true).forEach(function(r, i) {
       r.key = i;
     });
 
+    this.columns = Object.keys(coercedRows[0].cells),
+
     this.state = {
-      sortBy: this.props.sortBy || Object.keys(this.props.rows[0].cells)[0],
+      sortBy: this.props.sortBy || this.columns[0],
       sortDesc: this.props.sortDesc,
       // This is pretty goofy - since I want to be able to have expandable rows,
       // I need to keep track of each row"s expanded state on the table, since
-      // I can"t render the expanded child directly from the row component :|
+      // I can't render the expanded child directly from the row component :|
       // Surely there's a better way, but I can't find it
       rows: coercedRows
     };
   }
 
   setSort(col) {
-    if (col == "") {
-      return
-    }
     if (this.state.sortBy == col) {
       this.setState({
         sortDesc: !this.state.sortDesc
@@ -281,7 +276,9 @@ export class Table extends React.Component {
       <div style={this.props.style}>
         <table className={this.props.className}>
           <thead>
-            <tr>{
+            <tr>
+              {this.expandable ? <th/> : null}
+              {
               this.columns.map(col =>
                 <TableHeader
                   key={col}
@@ -289,14 +286,15 @@ export class Table extends React.Component {
                   onClick={() => this.setSort(col)}
                   sortBy={col == this.state.sortBy}
                   sortDesc={this.state.sortDesc}/>)
-            }</tr>
+              }
+            </tr>
           </thead>
           <tbody>{
             this.displayedRows().map(r =>
               <Row
                 key={r.key}
                 cells={r.cells}
-                tableWidthCols={this.columns.length - (this.expandable ? 1 : 0)}
+                tableWidthCols={this.columns.length}
                 expanderCol={this.expandable}
                 expanderBtn={r.children.length > 0}
                 onExpand={
@@ -320,13 +318,10 @@ export class Table extends React.Component {
         a = document.createElement("a");
 
     if (filename.endsWith("csv")) {
-      var cols = this.expandable ? this.columns.slice(1) : this.columns,
-          validRows = this.displayedRows().filter(r => Object.keys(r.cells).join(",") == cols.join(",")),
-          dataRows = validRows.map(r => cols.map(c => r.cells[c].display)),
-          rows = [cols].concat(dataRows),
+      var validRows = this.displayedRows().filter(r => Object.keys(r.cells).join(",") == this.columns.join(",")),
+          dataRows = validRows.map(r => this.columns.map(c => r.cells[c].display)),
+          rows = [this.columns].concat(dataRows),
           csv = rows.map(r => r.join(",")).join("\n");
-
-      console.log(validRows.length, cols, Object.keys(this.displayedRows()[0].cells))
 
       blob = new Blob([csv], {type: "text/csv"});
     }
@@ -405,15 +400,21 @@ export default class SearchTable extends React.Component {
   render() {
     return (
       <div style={this.props.style}>
-        <SearchBar label={this.props.label} onChange={(e) => this.setState({search: e.target.value})}/>
-        {React.createElement(Table, this.props)}
+        <SearchBar label={this.props.searchPrompt} onChange={(e) => this.setState({search: e.target.value})}/>
+        <Table
+          rows={this.props.rows}
+          search={this.state.search}
+          style={this.props.style}
+          showExportBtn={this.props.showExportBtn}
+          className={this.props.className}/>
       </div>
     );
   }
 }
 
 SearchTable.defaultProps = {
-  label: "Type to search",
+  searchPrompt: "Type to search",
+  showExportBtn: true
 }
 
 module.exports = {

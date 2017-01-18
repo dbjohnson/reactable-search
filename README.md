@@ -1,5 +1,5 @@
 # reactable
-Searchable table with JSON row definitions
+Searchable table with simple JSON row definitions
 
 [![License](https://img.shields.io/github/license/dbjohnson/reactable.svg)]()
 
@@ -50,7 +50,7 @@ var rows = [
 
 ReactDOM.render(
   <Reactables.SearchTable
-    label="Type to search"
+    searchPrompt="Type to search"
     rows={rows}/>,
   document.getElementByID("root");
 ```
