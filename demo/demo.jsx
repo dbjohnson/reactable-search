@@ -1,108 +1,55 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {SearchTable} from './reactable.js';
-import {Cell} from './reactable.js';
 
 
-var init = [
+var nyancat = "http://media.riffsy.com/images/806fa85fc55a55de66ab310e500b5f0f/raw";
+
+var rows = [
   {
-    fruit: {
-      sortVal: 3,
-      display: 'apples'
+    cells: {
+      fruit: {
+        sortVal: 3,
+        display: 'apples'
+      },
+      price: 8,
+      quantity: 3
     },
-    price: 8,
-    quantity: 3
+    children: [<img src={nyancat} style={{display: "block", margin: "auto"}}/>],
   },
   {
-    fruit: {
-      display: "<a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>",
-      sortVal: "bananas",
-    },
-    price: 5,
-    quantity: 2
+    cells: {
+      fruit: {
+        display: "<a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>",
+        sortVal: "bananas",
+      },
+      price: 5,
+      quantity: 2
+    }
   },
   {
-    fruit: "grapes",
-    price: 2,
-    quantity: {
-      sortVal: 1,
-      display: "I'm editable!",
-      onChange: "(e) => { console.log('You can watch my changes:', e) }"
+    cells: {
+      fruit: "grapes",
+      price: 2,
+      quantity: {
+        sortVal: 1,
+        display: "I'm editable!",
+        onChange: (e) => { console.log('You can watch my changes:', e) }
+      }
     }
   }
 ];
 
 
-class ExpandableRow extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      expanded: false
-    }
-  }
-
-  render() {
-
-  }
-}
-
-class DemoTable extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      rows: init,
-      value: JSON.stringify(init, null, 2),
-      error: false
-    };
-  }
-
-  render() {
-    return (
-        <div style={{margin: "10px", maxWidth:"800px"}}>
-          <SearchTable
-            label="Type to search"
-            rows={this.state.rows}
-            className="table table-bordered table-striped"/>
-
-          <hr/>
-
-          <div className="row" style={{margin:"auto", }}>
-            <h3 className="col-md-8">Table contents (play around!)</h3>
-            {this.state.error ?
-              <h3 className="col-md-4"><span className="label label-danger">Invalid JSON</span></h3> :
-              <h3 className="col-md-4"><span className="label label-success">Valid JSON</span></h3>
-            }
-          </div>
-          <textarea
-            rows="20"
-            style={{width: "100%"}}
-            value={this.state.value}
-            onChange={(e) => this.updateRows(e)}>
-          </textarea>
-
-      </div>
-    )
-  }
-
-  updateRows(e) {
-    this.setState({value: e.target.value});
-    try {
-      var rows = eval(e.target.value);
-      rows.forEach(function(r) {
-        if (r.onChange) {
-          r.onChange = eval(r.onChange);
-        }
-      });
-
-      this.setState({
-        rows: rows,
-        error: false
-      });
-    }
-    catch (e) {
-      this.setState({error: true})
-    }
-  }
+const DemoTable = (props) => {
+  return (
+    <div style={{margin: "10px", maxWidth:"800px"}}>
+      <SearchTable
+        label="Type to search"
+        rows={rows}
+        className="table table-bordered table-striped"/>
+    </div>
+  )
 };
 
 ReactDOM.render(<DemoTable/>, document.getElementById("root"))
