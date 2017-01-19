@@ -9,8 +9,8 @@ var rows = [
   {
     cells: {
       fruit: {
-        sortVal: 3,
-        display: 'apples'
+        sortVal: "a",
+        display: "apples"
       },
       price: 8,
       quantity: 3

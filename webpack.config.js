@@ -1,5 +1,5 @@
 module.exports = {
-  entry: "./src/entry.js",
+  entry: "./entry.js",
   output: {
     path: "lib",
     libraryTarget: "commonjs2",

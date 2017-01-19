@@ -157,17 +157,15 @@ class Row extends React.Component {
   }
 }
 
-class ExpanderButton extends React.Component {
-  render() {
-    return (
-        <button
-          className="btn btn-primary btn-xs"
-          style={{width:"22px"}} // keep button from changing width between +/-
-          onClick={() => this.props.onClick()}>
-          {this.props.expanded ? "-" : "+"}
-        </button>
-    );
-  }
+const ExpanderButton = (props) => {
+  return (
+      <button
+        className="btn btn-primary btn-xs"
+        style={{width:"22px"}} // keep button from changing width between +/-
+        onClick={() => props.onClick()}>
+        {props.expanded ? "-" : "+"}
+      </button>
+  );
 }
 
 
@@ -331,15 +329,24 @@ Table.defaultProps = {
 };
 
 
+const SortArrow = (props) => {
+  var rotate = props.rotate || (props.down ? 90 : -90);
+  return (
+    <div style={{WebkitTransform: `rotate(${rotate}deg)`, display: "inline-block", marginLeft: "5px"}}>➜</div>
+  )
+}
+
+
 const TableHeader = (props) => {
+  const renderArrow = () => {
+    if (props.sortBy) {
+      return <SortArrow down={props.sortDesc}/>
+    }
+  };
   return (
     <th key={props.col} onClick={props.onClick}>
       {props.col}
-      {props.sortBy ?
-        (props.sortDesc ?
-          <i className="fa fa-arrow-up" style={props.arrowStyle}/> :
-          <i className="fa fa-arrow-down" style={props.arrowStyle}/>) :
-      ""}
+      {renderArrow()}
     </th>
   );
 }
@@ -353,7 +360,7 @@ const SearchBar = (props) => {
     <form>
       <div className="form-group" style={props.style}>
         <div className="input-group">
-          <div className="input-group-addon"><i className="fa fa-search"/></div>
+          <div className="input-group-addon">&#x1f50d;</div>
           <input type="text" className="form-control" placeholder={props.label} onChange={props.onChange}/>
         </div>
       </div>

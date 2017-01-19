@@ -5,12 +5,10 @@ exclude_paths:
 - "lib/*"
 engines:
   duplication:
-    enabled: true
+    enabled: false
     config:
       languages:
       - javascript
-    exclude_fingerprints:
-    - 747133072a99764958df8bb2018b700c
   eslint:
     enabled: true
   fixme:
