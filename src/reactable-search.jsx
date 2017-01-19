@@ -397,11 +397,8 @@ export default class SearchTable extends React.Component {
       <div style={this.props.style}>
         <SearchBar label={this.props.searchPrompt} onChange={(e) => this.setState({search: e.target.value})}/>
         <Table
-          rows={this.props.rows}
           search={this.state.search}
-          style={this.props.style}
-          showExportBtn={this.props.showExportBtn}
-          className={this.props.className}/>
+          {...this.props}/>
       </div>
     );
   }
