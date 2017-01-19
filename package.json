@@ -1,36 +1,62 @@
 {
-  "name": "reactable",
-  "description": "React component searchable table",
+  "name": "reactable-search",
+  "description": "Simple, fast, searchable React table component",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dbjsonson/reactable.git"
+    "url": "git+https://github.com/dbjohnson/reactable-search.git"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
-    "babel-loader": "*",
-    "babel-core": "*",
-    "babel-plugin-transform-runtime": "*",
-    "babel-preset-es2015": "*",
-    "babel-preset-react": "*",
-    "bootstrap": "*",
-    "bootstrap-webpack": "*",
-    "css-loader": "*",
-    "exports-loader": "*",
-    "file-loader": "*",
-    "font-awesome": "*",
-    "font-awesome-webpack": "*",
-    "imports-loader": "*",
-    "jquery": "*",
-    "less": "*",
-    "less-loader": "*",
-    "react": "*",
-    "react-dom": "*",
-    "stacked": "*",
-    "style-loader": "*",
-    "url-loader": "*"
+    "bootstrap": "^3.3.7",
+    "font-awesome": "^4.7.0",
+    "jquery": "^3.1.1",
+    "less": "^2.7.2",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
   },
   "devDependencies": {
-    "webpack": "*",
-    "webpack-dev-server": "*"
-  }
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.2.10",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "bootstrap-webpack": "0.0.5",
+    "css-loader": "^0.26.1",
+    "expect": "^1.20.2",
+    "exports-loader": "^0.6.3",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "font-awesome-webpack": "0.0.4",
+    "imports-loader": "^0.7.0",
+    "karma": "^1.4.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-mocha": "^1.3.0",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^2.0.1",
+    "less-loader": "^2.2.3",
+    "mocha": "^3.2.0",
+    "react-addons-test-utils": "^15.4.2",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.16.2"
+  },
+  "bugs": {
+    "url": "https://github.com/dbjohnson/reactable-search/issues"
+  },
+  "homepage": "https://github.com/dbjohnson/reactable-search#readme",
+  "main": "lib/reactable-search.js",
+  "scripts": {
+    "test": "karma start",
+    "build": "webpack --progress"
+  },
+  "keywords": [
+    "react",
+    "component",
+    "table",
+    "reactable",
+    "search"
+  ],
+  "author": "Bryan Johnson <d.bryan.johnson+npm@gmail.com> (https://github.com/dbjohnson)",
+  "license": "MIT"
 }

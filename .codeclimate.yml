@@ -1,0 +1,28 @@
+languages:
+  JavaScript: true
+exclude_paths:
+- "demo/*"
+- "lib/*"
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+    exclude_fingerprints:
+    - 747133072a99764958df8bb2018b700c
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  radon:
+    enabled: true
+ratings:
+  paths:
+  - "**.inc"
+  - "**.js"
+  - "**.jsx"
+  - "**.module"
+  - "**.php"
+  - "**.py"
+  - "**.rb"

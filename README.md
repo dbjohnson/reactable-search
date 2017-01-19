@@ -1,12 +1,14 @@
-# reactable
+# reactable-search
 Searchable table with simple JSON row definitions
 
-[![License](https://img.shields.io/github/license/dbjohnson/reactable.svg)]()
+[![CircleCI](https://circleci.com/gh/dbjohnson/reactable-search.svg?style=shield)](https://circleci.com/gh/dbjohnson/reactable-search)
+[![Code Climate](https://codeclimate.com/github/dbjohnson/reactable-search/badges/gpa.svg)](https://codeclimate.com/github/dbjohnson/reactable-search)
+[![License](https://img.shields.io/github/license/dbjohnson/reactable-search.svg)]()
 
 
-[![](demo/demo.png)](https://dbjohnson.github.io/reactable/demo)
+[![](demo/demo.png)](https://dbjohnson.github.io/reactable-search/demo)
 
-[live demo](https://dbjohnson.github.io/reactable/demo)
+[live demo](https://dbjohnson.github.io/reactable-search/demo)
 
 
 ## Description
@@ -20,6 +22,12 @@ This React component is a simple live-searchable table with some basic enhanceme
 
 ## Quickstart
 
+###Install via npm
+```bash
+$ npm install --save reactable-search
+```
+
+### Build from repo
 ```bash
 $ npm install
 $ webpack
@@ -28,7 +36,6 @@ $ webpack
 ### Run demo
 ```
 $ npm install
-$ webpack --output-target=demo
 $ cd demo
 $ webpack-dev-server
 ```
@@ -39,7 +46,7 @@ $ webpack-dev-server
 ### Basic example
 
 ``` js
-import Reactables from './reactable.js';
+import SearchTable from 'reactable-search';
 import ReactDOM from 'react-dom';
 
 var rows = [
@@ -49,7 +56,7 @@ var rows = [
 ];
 
 ReactDOM.render(
-  <Reactables.SearchTable
+  <SearchTable
     searchPrompt="Type to search"
     rows={rows}/>,
   document.getElementByID("root");
@@ -111,8 +118,7 @@ var rows = [
 Please be gentle, this is my first React project, my first webpack project, and my first node project.  I'm sure there are many things that should have been differently - please leave feedback!
 
 
-## TODO
-* Publish to npm
+## Next steps
 * figure out modular styling in React
 * Gather feedback on organization, etc - please leave an issue if you see something obvious!
 

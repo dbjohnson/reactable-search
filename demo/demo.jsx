@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {SearchTable} from './reactable.js';
+import {SearchTable} from './reactable-search.js';
 
 
 var applegif = "http://i.giphy.com/wJRhcjWc7fKIE.gif";

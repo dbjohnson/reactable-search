@@ -1,9 +1,9 @@
 module.exports = {
   entry: "./src/entry.js",
   output: {
-    path: "dist",
+    path: "lib",
     libraryTarget: "commonjs2",
-    filename: "reactable.js"
+    filename: "reactable-search.js"
   },
   target: "node",
   module: {
@@ -46,5 +46,5 @@ module.exports = {
         loader: "url?limit=10000&mimetype=image/svg+xml"
       }
     ]
-  },
+  }
 };

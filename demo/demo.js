@@ -62,7 +62,7 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _reactable = __webpack_require__(179);
+	var _reactableSearch = __webpack_require__(179);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -108,7 +108,7 @@
 	  return _react2.default.createElement(
 	    'div',
 	    { style: { margin: "10px", maxWidth: "800px" } },
-	    _react2.default.createElement(_reactable.SearchTable, {
+	    _react2.default.createElement(_reactableSearch.SearchTable, {
 	      rows: rows,
 	      searchPrompt: 'Type to search',
 	      showExportBtn: true,
@@ -411,8 +411,15 @@
 /* 5 */
 /***/ function(module, exports) {
 
+	/*
+	object-assign
+	(c) Sindre Sorhus
+	@license MIT
+	*/
+
 	'use strict';
 	/* eslint-disable no-unused-vars */
+	var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -433,7 +440,7 @@
 			// Detect buggy property enumeration order in older V8 versions.
 
 			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-			var test1 = new String('abc');  // eslint-disable-line
+			var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
 			test1[5] = 'de';
 			if (Object.getOwnPropertyNames(test1)[0] === '5') {
 				return false;
@@ -462,7 +469,7 @@
 			}
 
 			return true;
-		} catch (e) {
+		} catch (err) {
 			// We don't expect any of the above to throw, but better to be safe.
 			return false;
 		}
@@ -482,8 +489,8 @@
 				}
 			}
 
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
+			if (getOwnPropertySymbols) {
+				symbols = getOwnPropertySymbols(from);
 				for (var i = 0; i < symbols.length; i++) {
 					if (propIsEnumerable.call(from, symbols[i])) {
 						to[symbols[i]] = from[symbols[i]];
@@ -21709,13 +21716,17 @@
 	return mixin;},// This looks DOM specific but these are actually isomorphic helpers
 	// since they are just generating DOM strings.
 	DOM:ReactDOMFactories,version:ReactVersion,// Deprecated hook for JSX spread, don't use this for anything.
-	__spread:__spread};module.exports=React;/***/},/* 181 *//***/function(module,exports){'use strict';/* eslint-disable no-unused-vars */var hasOwnProperty=Object.prototype.hasOwnProperty;var propIsEnumerable=Object.prototype.propertyIsEnumerable;function toObject(val){if(val===null||val===undefined){throw new TypeError('Object.assign cannot be called with null or undefined');}return Object(val);}function shouldUseNative(){try{if(!_assign3.default){return false;}// Detect buggy property enumeration order in older V8 versions.
+	__spread:__spread};module.exports=React;/***/},/* 181 *//***/function(module,exports){/*
+		object-assign
+		(c) Sindre Sorhus
+		@license MIT
+		*/'use strict';/* eslint-disable no-unused-vars */var getOwnPropertySymbols=_getOwnPropertySymbols2.default;var hasOwnProperty=Object.prototype.hasOwnProperty;var propIsEnumerable=Object.prototype.propertyIsEnumerable;function toObject(val){if(val===null||val===undefined){throw new TypeError('Object.assign cannot be called with null or undefined');}return Object(val);}function shouldUseNative(){try{if(!_assign3.default){return false;}// Detect buggy property enumeration order in older V8 versions.
 	// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-	var test1=new String('abc');// eslint-disable-line
+	var test1=new String('abc');// eslint-disable-line no-new-wrappers
 	test1[5]='de';if((0,_getOwnPropertyNames2.default)(test1)[0]==='5'){return false;}// https://bugs.chromium.org/p/v8/issues/detail?id=3056
 	var test2={};for(var i=0;i<10;i++){test2['_'+String.fromCharCode(i)]=i;}var order2=(0,_getOwnPropertyNames2.default)(test2).map(function(n){return test2[n];});if(order2.join('')!=='0123456789'){return false;}// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-	var test3={};'abcdefghijklmnopqrst'.split('').forEach(function(letter){test3[letter]=letter;});if((0,_keys4.default)((0,_assign3.default)({},test3)).join('')!=='abcdefghijklmnopqrst'){return false;}return true;}catch(e){// We don't expect any of the above to throw, but better to be safe.
-	return false;}}module.exports=shouldUseNative()?_assign3.default:function(target,source){var from;var to=toObject(target);var symbols;for(var s=1;s<arguments.length;s++){from=Object(arguments[s]);for(var key in from){if(hasOwnProperty.call(from,key)){to[key]=from[key];}}if(_getOwnPropertySymbols2.default){symbols=(0,_getOwnPropertySymbols2.default)(from);for(var i=0;i<symbols.length;i++){if(propIsEnumerable.call(from,symbols[i])){to[symbols[i]]=from[symbols[i]];}}}}return to;};/***/},/* 182 *//***/function(module,exports,__webpack_require__){/**
+	var test3={};'abcdefghijklmnopqrst'.split('').forEach(function(letter){test3[letter]=letter;});if((0,_keys4.default)((0,_assign3.default)({},test3)).join('')!=='abcdefghijklmnopqrst'){return false;}return true;}catch(err){// We don't expect any of the above to throw, but better to be safe.
+	return false;}}module.exports=shouldUseNative()?_assign3.default:function(target,source){var from;var to=toObject(target);var symbols;for(var s=1;s<arguments.length;s++){from=Object(arguments[s]);for(var key in from){if(hasOwnProperty.call(from,key)){to[key]=from[key];}}if(getOwnPropertySymbols){symbols=getOwnPropertySymbols(from);for(var i=0;i<symbols.length;i++){if(propIsEnumerable.call(from,symbols[i])){to[symbols[i]]=from[symbols[i]];}}}}return to;};/***/},/* 182 *//***/function(module,exports,__webpack_require__){/**
 		 * Copyright 2013-present, Facebook, Inc.
 		 * All rights reserved.
 		 *
