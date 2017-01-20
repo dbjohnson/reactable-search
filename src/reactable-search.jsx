@@ -88,11 +88,16 @@ const CoerceCells = (cells) => {
   var coerced = {};
   Object.keys(cells).forEach(function(c, j) {
     var cell = cells[c];
-    coerced[c] = {
-      sortVal: cell.sortVal || cell,
-      display: cell.display  || cell,
-      onChange: cell.onChange
-    };
+    if (Object.keys(cell).length) {
+      coerced[c] = {
+        sortVal: cell.sortVal || cell,
+        display: cell.display  || cell,
+        onChange: cell.onChange
+      };
+    }
+    else {
+      coerced[c] = cell;
+    }
   })
   return coerced;
 }
@@ -121,7 +126,7 @@ class Row extends React.Component {
     if (this.props.expanderCol) {
       if (this.props.expanderBtn) {
         return (
-          <td style={{width: "34px"}}>
+          <td style={{width: "41px"}}>
             <ExpanderButton
               expanded={this.props.expanded}
               onClick={() => {
@@ -131,7 +136,7 @@ class Row extends React.Component {
         );
       }
       else {
-        return <td/>
+        return <td style={{width: "41px"}}/>
       }
     }
   }
@@ -139,9 +144,7 @@ class Row extends React.Component {
   render() {
     return (
       <tr>
-        {
-          this.renderExpander()
-        }
+        {this.renderExpander()}
         {
           Object.values(this.props.cells).map((c, j) =>
             <Cell
@@ -292,7 +295,7 @@ export class SearchTable extends React.Component {
   }
 
   filter(rows) {
-    var searchTokens = this.props.search.split(/[ ,]+/),
+    var searchTokens = this.state.search.split(/[ ,]+/),
         regexes = searchTokens.map(st => new RegExp(st, "gi")),
         filtered = rows.filter(row =>
           regexes.every(re =>
