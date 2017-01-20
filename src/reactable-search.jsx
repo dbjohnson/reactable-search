@@ -121,7 +121,7 @@ class Row extends React.Component {
     if (this.props.expanderCol) {
       if (this.props.expanderBtn) {
         return (
-          <td style={{width: "30px"}}>
+          <td style={{width: "34px"}}>
             <ExpanderButton
               expanded={this.props.expanded}
               onClick={() => {
@@ -169,6 +169,65 @@ const ExpanderButton = (props) => {
 }
 
 
+const SortArrow = (props) => {
+  var rotate = props.rotate || (props.down ? 90 : -90);
+  return (
+    <div style={{WebkitTransform: `rotate(${rotate}deg)`, display: "inline-block", marginLeft: "5px"}}>➜</div>
+  )
+}
+
+
+const TableHeader = (props) => {
+  const renderArrow = () => {
+    if (props.sortBy) {
+      return <SortArrow down={props.sortDesc}/>
+    }
+  };
+  return (
+    <th key={props.col} onClick={props.onClick}>
+      {props.col}
+      {renderArrow()}
+    </th>
+  );
+}
+
+const SearchBar = (props) => {
+  return (
+    <form>
+      <div className="form-group" style={props.style}>
+        <div className="input-group">
+          <div className="input-group-addon">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABQ0lEQVQ4T53SvyvtcRzH8Yckg8LAzR/AgNxRke6NgT+AhVIGRkqSge6im+6o3NUgJPcORhaTyGByDUySgYv1DnK7t7c+R9++zjnFd/u+36/P8/3rVeH1V49O1OIKJ/hbRPccqsgkavAN46jOxK8xh81ikAIgHu+jGV/wEw9oxVSCLuBrHlIArGAYXbgoUmkSy+jBYTYfgJj5BjP4XmLW0B0k3WAe0I89NOG21LIwjXk05AFD+IEqPJUBjGI16V5k0Vqc7BgfcVoGsIQo1pLvoBKX2MVECUB44hzrmM0D4n8EG+lkcZF/GVE83sYAOvCrGCBisaBFHCUf3KMNY2nBoTlDH34XIFknRqw7nfMz6tJoO1jDVgIGpBd3eSuX2d9z6kNya3saIzq5y3fwFkhc7NNbAVGgMXUSlxt8DyAgYf8/ePwPza86J6hmCwMAAAAASUVORK5CYII="/>
+          </div>
+          <input
+            type="text"
+            className="form-control"
+            placeholder={props.placeholder}
+            onChange={props.onChange}/>
+        </div>
+      </div>
+    </form>
+  );
+};
+
+SearchBar.defaultProps = {
+  placeholder: "Type to search"
+}
+
+
+const ExportButton = (props) => {
+  return (
+    <button
+      type="button"
+      className="btn btn-primary btn-sm"
+      onClick={props.onClick}
+      style={{marginRight: "5px"}}>
+      Export to {props.format}
+    </button>
+  );
+}
+
+
 const expandRows = (rows, force) => {
   // recursively expand any collapsed rows
   var expanded = [];
@@ -182,7 +241,7 @@ const expandRows = (rows, force) => {
 }
 
 
-export class Table extends React.Component {
+export class SearchTable extends React.Component {
   constructor(props) {
     super(props);
 
@@ -200,6 +259,7 @@ export class Table extends React.Component {
     this.columns = Object.keys(coercedRows[0].cells),
 
     this.state = {
+      search: '',
       sortBy: this.props.sortBy || this.columns[0],
       sortDesc: this.props.sortDesc,
       // This is pretty goofy - since I want to be able to have expandable rows,
@@ -256,9 +316,20 @@ export class Table extends React.Component {
     }
   }
 
+  renderSearchBar() {
+    if (this.props.showSearchBar) {
+      return (
+        <SearchBar
+          placeholder={this.props.searchPrompt}
+          onChange={(e) => this.setState({search: e.target.value})}/>
+      );
+    }
+  }
+
   render() {
     return (
       <div style={this.props.style}>
+        {this.renderSearchBar()}
         <table className={this.props.className}>
           <thead>
             <tr>
@@ -322,93 +393,15 @@ export class Table extends React.Component {
 };
 
 
-Table.defaultProps = {
+SearchTable.defaultProps = {
   className: "table table-bordered table-striped",
   search: "",
-  showExportBtn: false
-};
-
-
-const SortArrow = (props) => {
-  var rotate = props.rotate || (props.down ? 90 : -90);
-  return (
-    <div style={{WebkitTransform: `rotate(${rotate}deg)`, display: "inline-block", marginLeft: "5px"}}>➜</div>
-  )
-}
-
-
-const TableHeader = (props) => {
-  const renderArrow = () => {
-    if (props.sortBy) {
-      return <SortArrow down={props.sortDesc}/>
-    }
-  };
-  return (
-    <th key={props.col} onClick={props.onClick}>
-      {props.col}
-      {renderArrow()}
-    </th>
-  );
-}
-
-TableHeader.defaultProps = {
-  arrowStyle: {marginLeft:"5px"}
-}
-
-const SearchBar = (props) => {
-  return (
-    <form>
-      <div className="form-group" style={props.style}>
-        <div className="input-group">
-          <div className="input-group-addon">&#x1f50d;</div>
-          <input type="text" className="form-control" placeholder={props.label} onChange={props.onChange}/>
-        </div>
-      </div>
-    </form>
-  );
-};
-
-SearchBar.defaultProps = {
-  label: "Type to search"
-}
-
-
-const ExportButton = (props) => {
-  return (
-    <button
-      type="button"
-      className="btn btn-primary btn-sm"
-      onClick={props.onClick}
-      style={{marginRight: "5px"}}>
-      Export to {props.format}
-    </button>
-  );
-}
-
-
-export default class SearchTable extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {search: ""};
-  }
-
-  render() {
-    return (
-      <div style={this.props.style}>
-        <SearchBar label={this.props.searchPrompt} onChange={(e) => this.setState({search: e.target.value})}/>
-        <Table
-          search={this.state.search}
-          {...this.props}/>
-      </div>
-    );
-  }
-}
-
-SearchTable.defaultProps = {
   searchPrompt: "Type to search",
-  showExportBtn: false
-}
-
-module.exports = {
-  SearchTable, Table
+  showExportBtn: {false},
+  showSearchBar: {true},
+  style: {margin: "10px"}
 };
+
+
+
+module.exports = SearchTable;
