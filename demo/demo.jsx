@@ -8,10 +8,7 @@ var applegif = "http://i.giphy.com/wJRhcjWc7fKIE.gif";
 var rows = [
   {
     cells: {
-      fruit: {
-        sortVal: "a",
-        display: "apples"
-      },
+      fruit: "apples",
       price: 8,
       quantity: 3
     },
@@ -23,10 +20,7 @@ var rows = [
   },
   {
     cells: {
-      fruit: {
-        display: <a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>,
-        sortVal: "bananas",
-      },
+      fruit: <a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>,
       price: 5,
       quantity: 2
     }
@@ -36,7 +30,6 @@ var rows = [
       fruit: "grapes",
       price: 2,
       quantity: {
-        sortVal: 1,
         display: "I'm editable!",
         onChange: (e) => { console.log('You can watch my changes:', e) }
       }
@@ -51,7 +44,8 @@ const DemoTable = (props) => {
       <SearchTable
         rows={rows}
         searchPrompt="Type to search"
-        showExportBtn={true}
+        showExportCSVBtn={true}
+        showExportJSONBtn={true}
         className="table table-bordered table-striped"/>
     </div>
   )

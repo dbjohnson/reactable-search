@@ -274,6 +274,7 @@ module.exports =
 	};
 
 	var CoerceCells = function CoerceCells(cells) {
+	  // Set defaults for any missing keys on each cell
 	  var coerced = {};
 	  (0, _keys2.default)(cells).forEach(function (c, j) {
 	    var cell = cells[c] || "";
@@ -282,8 +283,8 @@ module.exports =
 	      var content;
 
 	      (function () {
+	        // dig down to the root for complex cells (e.g., links, etc.)
 	        var innermostValue = function innermostValue(obj) {
-	          // dig down to the root for complex cells (e.g., links, etc.)
 	          try {
 	            return innermostValue(obj.props.children);
 	          } catch (err) {
@@ -291,20 +292,22 @@ module.exports =
 	          }
 	        };
 
-	        content = innermostValue(cell.display || cell);
+	        content = innermostValue(cell.display || cell) || "";
 
 	        coerced[c] = {
 	          sortVal: cell.sortVal || content,
 	          display: cell.display || cell || content,
-	          searchTerm: cell.searchTerm || String(content),
+	          searchTerm: String(cell.searchTerm || content),
 	          onChange: cell.onChange
 	        };
 	      })();
 	    } else {
+	      // primitivite type - use the same value for display, search and sort
 	      coerced[c] = {
 	        display: cell,
-	        searchTerm: cell,
-	        sortVal: cell
+	        searchTerm: String(cell),
+	        sortVal: cell,
+	        onChange: null
 	      };
 	    }
 	  });

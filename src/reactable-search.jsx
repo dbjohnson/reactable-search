@@ -80,13 +80,14 @@ Cell.defaultProperties = {
 }
 
 const CoerceCells = (cells) => {
+  // Set defaults for any missing keys on each cell
   var coerced = {};
   Object.keys(cells).forEach(function(c, j) {
     var cell = cells[c] || "";
 
     if (Object.keys(cell).length) {
+      // dig down to the root for complex cells (e.g., links, etc.)
       function innermostValue(obj) {
-        // dig down to the root for complex cells (e.g., links, etc.)
         try {
           return innermostValue(obj.props.children);
         }
@@ -95,19 +96,21 @@ const CoerceCells = (cells) => {
         }
       }
 
-      var content = innermostValue(cell.display || cell);
+      var content = innermostValue(cell.display || cell) || "";
       coerced[c] = {
         sortVal: cell.sortVal || content,
         display: cell.display  || cell || content,
-        searchTerm: cell.searchTerm || String(content),
+        searchTerm: String(cell.searchTerm || content),
         onChange: cell.onChange
       };
     }
     else {
+      // primitivite type - use the same value for display, search and sort
       coerced[c] = {
         display: cell,
-        searchTerm: cell,
-        sortVal: cell
+        searchTerm: String(cell),
+        sortVal: cell,
+        onChange: null
       };
     }
   })
