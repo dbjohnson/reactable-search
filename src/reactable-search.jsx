@@ -39,13 +39,12 @@ export class Cell extends React.Component {
     }
   }
 
+
+
   render() {
     if (this.props.onChange) {
       return (
-        <td
-          style={this.props.style}
-          colSpan={this.props.colSpan}
-          rowSpan={this.props.rowSpan}>
+        <td {...this.props}>
           <ContentEditable
             html={this.state.edited}
             onChange={(e) => this.props.onChange(e)}/>
@@ -54,18 +53,14 @@ export class Cell extends React.Component {
     }
     else {
       if (typeof this.props.display === "string") {
-        return <td
-                style={this.props.style}
-                colSpan={this.props.colSpan}
-                rowSpan={this.props.rowSpan}
-                dangerouslySetInnerHTML={{__html: this.props.display}}/>;
+        return (
+          <td {...this.props}
+              dangerouslySetInnerHTML={{__html: this.props.display}}/>
+        );
       }
       else {
         return (
-          <td
-            style={this.props.style}
-            colSpan={this.props.colSpan}
-            rowSpan={this.props.rowSpan}>
+          <td {...this.props}>
             {this.props.display}
           </td>
         );
@@ -87,18 +82,36 @@ Cell.defaultProperties = {
 const CoerceCells = (cells) => {
   var coerced = {};
   Object.keys(cells).forEach(function(c, j) {
-    var cell = cells[c];
+    var cell = cells[c] || "";
+
     if (Object.keys(cell).length) {
+      function innermostValue(obj) {
+        // dig down to the root for complex cells (e.g., links, etc.)
+        try {
+          return innermostValue(obj.props.children);
+        }
+        catch(err) {
+          return obj;
+        }
+      }
+
+      var content = innermostValue(cell.display || cell);
       coerced[c] = {
-        sortVal: cell.sortVal || cell,
-        display: cell.display  || cell,
+        sortVal: cell.sortVal || content,
+        display: cell.display  || cell || content,
+        searchTerm: cell.searchTerm || String(content),
         onChange: cell.onChange
       };
     }
     else {
-      coerced[c] = cell;
+      coerced[c] = {
+        display: cell,
+        searchTerm: cell,
+        sortVal: cell
+      };
     }
   })
+
   return coerced;
 }
 
@@ -248,29 +261,42 @@ export class SearchTable extends React.Component {
   constructor(props) {
     super(props);
 
-    // coerce all row definitions to standard format
-    var coercedRows = props.rows.map(r => CoerceRow(r))
+    var rows = this.init(this.props.rows);
 
-    // see if any rows are expandable
-    this.expandable = coercedRows.some(r => r.children.length)
+    this.state = {
+      search: '',
+      sortBy: this.props.sortBy || Object.keys(rows[0].cells)[0],
+      sortDesc: this.props.sortDesc,
+      // This is pretty goofy - since I want to be able to have expandable rows,
+      // I need to keep track of each row"s expanded state on the table, since
+      // I can't render the expanded child directly from the row component :|
+      // Surely there's a better way, but I can't find it
+      rows: rows
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.rows) {
+      var rows = this.init(nextProps.rows);
+      this.setState({
+        rows: rows,
+        sortBy: nextProps.sortBy || Object.keys(rows[0].cells)[0]
+      });
+    }
+  }
+
+  init(rows) {
+    // coerce all row definitions to standard format
+    var coercedRows = rows.map(r => CoerceRow(r))
 
     // recursively expand any collapsed rows and assign unique indexes
     expandRows(coercedRows, true).forEach(function(r, i) {
       r.key = i;
     });
 
-    this.columns = Object.keys(coercedRows[0].cells),
-
-    this.state = {
-      search: '',
-      sortBy: this.props.sortBy || this.columns[0],
-      sortDesc: this.props.sortDesc,
-      // This is pretty goofy - since I want to be able to have expandable rows,
-      // I need to keep track of each row"s expanded state on the table, since
-      // I can't render the expanded child directly from the row component :|
-      // Surely there's a better way, but I can't find it
-      rows: coercedRows
-    };
+    this.expandable = coercedRows.some(r => r.children.length);
+    this.columns = Object.keys(coercedRows[0].cells);
+    return coercedRows;
   }
 
   setSort(col) {
@@ -288,10 +314,15 @@ export class SearchTable extends React.Component {
   }
 
   sort() {
-    return this.state.rows.sort((a, b) => {
-      var diff = a.cells[this.state.sortBy].sortVal > b.cells[this.state.sortBy].sortVal;
-      return this.state.sortDesc ? !diff : diff;
-    });
+    if (this.state.sortBy) {
+      return this.state.rows.sort((a, b) => {
+        if (a.cells[this.state.sortBy].sortVal == b.cells[this.state.sortBy].sortVal) {
+          return 0;
+        }
+        var diff = a.cells[this.state.sortBy].sortVal > b.cells[this.state.sortBy].sortVal ? 1 : -1;
+        return this.state.sortDesc ? -diff : diff;
+      });
+    }
   }
 
   filter(rows) {
@@ -300,7 +331,7 @@ export class SearchTable extends React.Component {
         filtered = rows.filter(row =>
           regexes.every(re =>
             Object.values(row.cells).some(c =>
-              String(c.display).match(re))));
+              c.searchTerm.match(re))));
     return filtered
   }
 
@@ -309,11 +340,24 @@ export class SearchTable extends React.Component {
   }
 
   renderExportButtons() {
-    if (this.props.showExportBtn) {
+    var formats = [];
+    if (this.props.showExportCSVBtn) {
+      formats.push("CSV")
+    }
+    if (this.props.showExportJSONBtn) {
+      formats.push("JSON")
+    }
+
+    if (formats.length) {
       return (
         <div className="row" style={{margin: "auto"}}>
-          <ExportButton format="CSV" onClick={()=>this.exportFile("table.csv")}/>
-          <ExportButton format="JSON" onClick={()=>this.exportFile("table.json")}/>
+        {
+          formats.map((f, i) =>
+            <ExportButton
+              key={i}
+              format={f}
+              onClick={()=>this.exportFile(f)}/>)
+        }
         </div>
       );
     }
@@ -331,7 +375,7 @@ export class SearchTable extends React.Component {
 
   render() {
     return (
-      <div style={this.props.style}>
+      <div id={this.props.id} className={this.props.class} style={this.props.style}>
         {this.renderSearchBar()}
         <table className={this.props.className}>
           <thead>
@@ -373,15 +417,15 @@ export class SearchTable extends React.Component {
     );
   }
 
-  exportFile(filename) {
+  exportFile(format) {
     var blob = null,
         a = document.createElement("a");
 
-    if (filename.endsWith("csv")) {
+    if (format == "CSV") {
       var validRows = this.displayedRows().filter(r => Object.keys(r.cells).join(",") == this.columns.join(",")),
-          dataRows = validRows.map(r => this.columns.map(c => r.cells[c].display)),
+          dataRows = validRows.map(r => this.columns.map(c => r.cells[c].searchTerm)),
           rows = [this.columns].concat(dataRows),
-          csv = rows.map(r => r.join(",")).join("\n");
+          csv = rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
 
       blob = new Blob([csv], {type: "text/csv"});
     }
@@ -389,7 +433,7 @@ export class SearchTable extends React.Component {
       blob = new Blob([JSON.stringify(this.props.rows, null, 2)], {type: "text/json"});
     }
 
-    a.download = filename;
+    a.download = "table." + (format == "CSV" ? "csv" : "json");
     a.href = window.URL.createObjectURL(blob);
     a.click();
   }
@@ -400,9 +444,9 @@ SearchTable.defaultProps = {
   className: "table table-bordered table-striped",
   search: "",
   searchPrompt: "Type to search",
-  showExportBtn: {false},
-  showSearchBar: {true},
-  style: {margin: "10px"}
+  showExportCSVBtn: false,
+  showExportJSONBtn: false,
+  showSearchBar: true
 };
 
 

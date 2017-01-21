@@ -24,7 +24,7 @@ var rows = [
   {
     cells: {
       fruit: {
-        display: "<a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>",
+        display: <a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>,
         sortVal: "bananas",
       },
       price: 5,
