@@ -11,7 +11,6 @@ var rows = [
 
 describe('SearchTable', function () {
   it('renders without problems', function () {
-    //var root = TestUtils.renderIntoDocument(<SearchTable rows={rows}/>);
     var root = TestUtils.renderIntoDocument(React.createElement('SearchTable', {rows: rows}));
     expect(root).toExist();
   });
