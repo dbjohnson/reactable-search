@@ -39,8 +39,6 @@ export class Cell extends React.Component {
     }
   }
 
-
-
   render() {
     if (this.props.onChange) {
       return (
@@ -280,10 +278,41 @@ export class SearchTable extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.rows) {
-      var rows = this.init(nextProps.rows);
+      try {
+        // oof, this is pretty gross and will probably break.  React objects
+        // contain a reference to the parent, and so if any cells contain components
+        // such as hyperlinks that update the parent, jsonification will fail
+        // due to circular refs.  Let's try to avoid that by ignoring any references
+        // to "_owner"
+        const stringifySafe = (obj) => {
+          return JSON.stringify(obj, function(key, val) {
+            if (key == "_owner") {
+              return "owner";
+            }
+            return val;
+          });
+        }
+
+        // Try comparing JSON string dumps of the rows to see if they're unchanged.
+        // This won't always work because not all rows will be stringifiable
+        if (stringifySafe(nextProps.rows) == stringifySafe(this.props.rows)) {
+          return;
+        }
+      } catch (err) {}
+
+      var newRows = this.init(nextProps.rows),
+          newSort = this.state.sortBy;
+
+      if (nextProps.sortBy) {
+        newSort = nextProps.sortBy;
+      }
+      else if(Object.keys(newRows[0]).indexOf(this.state.sortBy) == 0) {
+        newSort = Object.keys(newRows[0])[0];
+      }
+
       this.setState({
-        rows: rows,
-        sortBy: nextProps.sortBy || Object.keys(rows[0].cells)[0]
+        rows: newRows,
+        sortBy: newSort
       });
     }
   }
