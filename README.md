@@ -27,20 +27,6 @@ This React component is a simple live-searchable table with some basic enhanceme
 $ npm install --save reactable-search
 ```
 
-### Build from repo
-```bash
-$ npm install
-$ webpack
-```
-
-### Run demo
-```
-$ npm install
-$ cd demo
-$ webpack-dev-server
-```
-
-
 ## Usage
 
 ### Basic example
@@ -70,7 +56,7 @@ Each row can be either a simple JSON object where `key:value` specifies `colname
 
 ```js
 var rows = [
-  {{a: 1, b: 2}},
+  {a: 1, b: 2},
   {a: 2, b: 3},
   ...
 ];
@@ -81,10 +67,10 @@ var rows = [
 ```js
 var expandableRows = [
   {
-    cells: {a: 1, b: 2}}
+    cells: {a: 1, b: 2}
     children: [{
       cells: {c: 'x'},
-      children: []
+      children: [...]
     }, 
   }, 
   ...
@@ -95,9 +81,6 @@ var expandableRows = [
 
 Similar to rows, cell definition may be any valid DOM, or a contain a "rich" definition allowing optional specification of separate values for sorting vs. display, and an `onChange` callback function, which if provided will make the cell editable.
 
-#### Simple cell example
-All examples in the [row section](#rows) use simple cell definitions.
-
 #### Rich cell example
 ```js
 var rows = [
@@ -105,7 +88,7 @@ var rows = [
     cells: {
       fruit: {
         display: <label className="label label-danger">bananas</label>,
-        sortVal: "bananas",
+        sortVal: 5,
         onChange: (e) => { console.log('You can watch my changes:', e) }
       },
       price: 5, 
@@ -116,12 +99,3 @@ var rows = [
 
 ## Disclaimer
 Please be gentle, this is my first React project, my first webpack project, and my first node project.  I'm sure there are many things that should have been differently - please leave feedback!
-
-
-## Next steps
-* figure out modular styling in React
-* Gather feedback on organization, etc - please leave an issue if you see something obvious!
-
-
-## Inspiration
-[Check out this simplicity](http://jsfiddle.net/dfsq/7BUmG/1133/)

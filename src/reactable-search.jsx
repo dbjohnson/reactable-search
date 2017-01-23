@@ -94,9 +94,13 @@ const CoerceCells = (cells) => {
         }
       }
 
-      var content = innermostValue(cell.display || cell) || "";
+      var content = innermostValue(cell.display || cell);
+      if (content == null) {
+        content = "";
+      }
+
       coerced[c] = {
-        sortVal: cell.sortVal || content,
+        sortVal: cell.sortVal == null ? content : cell.sortVal,
         display: cell.display  || cell || content,
         searchTerm: String(cell.searchTerm || content),
         onChange: cell.onChange
