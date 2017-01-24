@@ -3,6 +3,7 @@ Searchable table with simple JSON row definitions
 
 [![CircleCI](https://circleci.com/gh/dbjohnson/reactable-search.svg?style=shield)](https://circleci.com/gh/dbjohnson/reactable-search)
 [![Code Climate](https://codeclimate.com/github/dbjohnson/reactable-search/badges/gpa.svg)](https://codeclimate.com/github/dbjohnson/reactable-search)
+[![Downloads](https://img.shields.io/npm/dm/reactable-search.svg)](https://www.npmjs.com/package/reactable-search)
 [![License](https://img.shields.io/github/license/dbjohnson/reactable-search.svg)]()
 
 

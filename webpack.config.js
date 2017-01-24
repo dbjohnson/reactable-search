@@ -1,7 +1,7 @@
 module.exports = {
-  entry: "./entry.js",
+  entry: "./reactable-search.js",
   output: {
-    path: "lib",
+    path: "dist",
     libraryTarget: "commonjs2",
     filename: "reactable-search.js"
   },

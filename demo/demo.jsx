@@ -3,18 +3,18 @@ import ReactDOM from 'react-dom';
 import SearchTable from './reactable-search.js';
 
 
-var applegif = "http://i.giphy.com/wJRhcjWc7fKIE.gif";
+const applegif = 'http://i.giphy.com/wJRhcjWc7fKIE.gif';
 
-var rows = [
+const rows = [
   {
     cells: {
-      fruit: "apples",
+      fruit: 'apples',
       price: 8,
       quantity: 3
     },
     children: [{
       cells: {
-        gif: <img src={applegif} style={{display: "block", margin: "auto"}}/>
+        gif: <img src={applegif} style={{display: 'block', margin: 'auto'}}/>
       }},
     ]
   },
@@ -27,10 +27,10 @@ var rows = [
   },
   {
     cells: {
-      fruit: "grapes",
+      fruit: 'grapes',
       price: 2,
       quantity: {
-        display: "I'm editable!",
+        display: 'I\'m editable!',
         onChange: (e) => { console.log('You can watch my changes:', e) }
       }
     }
@@ -40,15 +40,15 @@ var rows = [
 
 const DemoTable = (props) => {
   return (
-    <div style={{margin: "10px", maxWidth:"800px"}}>
+    <div style={{margin: '10px', maxWidth:'800px'}}>
       <SearchTable
         rows={rows}
-        searchPrompt="Type to search"
+        searchPrompt='Type to search'
         showExportCSVBtn={true}
         showExportJSONBtn={true}
-        className="table table-bordered table-striped"/>
+        className='table table-bordered table-striped'/>
     </div>
   )
 };
 
-ReactDOM.render(<DemoTable/>, document.getElementById("root"))
+ReactDOM.render(<DemoTable/>, document.getElementById('root'))

@@ -1,7 +1,7 @@
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 import expect from 'expect';
-import SearchTable from '../lib/reactable-search.js';
+import SearchTable from '../lib/SearchTable.jsx';
 
 
 var rows = [

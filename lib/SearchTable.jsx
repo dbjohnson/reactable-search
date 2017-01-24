@@ -1,5 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 
 class ContentEditable extends React.Component {
@@ -18,7 +18,7 @@ class ContentEditable extends React.Component {
   }
 
   emitChange(e) {
-    var html = e.nativeEvent.target.innerHTML;
+    const html = e.nativeEvent.target.innerHTML;
     // make sure the value has actually changed before sending any notifications.
     // for example, the user could have just entered the cell then left without
     // changing content - this would still fire the onBlur event
@@ -50,7 +50,7 @@ export class Cell extends React.Component {
       );
     }
     else {
-      if (typeof this.props.display === "string") {
+      if (typeof this.props.display === 'string') {
         return (
           <td {...this.props}
               dangerouslySetInnerHTML={{__html: this.props.display}}/>
@@ -77,56 +77,56 @@ Cell.defaultProperties = {
   rowSpan: 1
 }
 
-const CoerceCells = (cells) => {
-  // Set defaults for any missing keys on each cell
-  var coerced = {};
-  Object.keys(cells).forEach(function(c, j) {
-    var cell = cells[c] || "";
-
-    if (Object.keys(cell).length) {
-      // dig down to the root for complex cells (e.g., links, etc.)
-      function innermostValue(obj) {
-        try {
-          return innermostValue(obj.props.children);
-        }
-        catch(err) {
-          return obj;
-        }
+const CoerceCell = (cell='') => {
+  if (Object.keys(cell).length >= 0) {
+    // dig down to the root for complex cells (e.g., links, etc.)
+    function innermostValue(obj=cell) {
+      try {
+        return innermostValue(obj.props.children);
       }
-
-      var content = innermostValue(cell.display || cell);
-      if (content == null) {
-        content = "";
+      catch(err) {
+        if (obj == null) return '';
+        else return obj;
       }
+    }
 
-      coerced[c] = {
-        sortVal: cell.sortVal == null ? content : cell.sortVal,
-        display: cell.display  || cell || content,
-        searchTerm: String(cell.searchTerm || content),
+    const content = innermostValue(cell.display);
+
+    const coerce = (display=cell, sortVal=content, searchTerm=String(content)) => {
+      return {
+        display: display,
+        searchTerm: searchTerm,
+        sortVal: sortVal,
         onChange: cell.onChange
       };
     }
-    else {
-      // primitivite type - use the same value for display, search and sort
-      coerced[c] = {
-        display: cell,
-        searchTerm: String(cell),
-        sortVal: cell,
-        onChange: null
-      };
-    }
-  })
 
-  return coerced;
+    return coerce(cell.display, cell.sortVal, cell.searchTerm)
+  }
+  else {
+    // primitivite type - use the same value for display, search and sort
+    return {
+      display: cell,
+      searchTerm: String(cell),
+      sortVal: cell,
+      onChange: null
+    };
+  }
 }
 
 
 const CoerceRow = (row) => {
-  return {
-    children: (row.children || []).map(c => CoerceRow(c)),
-    expanded: false,
-    cells: CoerceCells(row.cells || row)
+  const coerce = (cells=row, children=[]) => {
+    return {
+      children: (children).map(c => CoerceRow(c)),
+      expanded: false,
+      cells: Object.keys(cells).reduce((map, k) => {
+        map[k] = CoerceCell(cells[k]);
+        return map;
+      }, {})
+    }
   }
+  return coerce(row.cells, row.children);
 }
 
 
@@ -144,7 +144,7 @@ class Row extends React.Component {
     if (this.props.expanderCol) {
       if (this.props.expanderBtn) {
         return (
-          <td style={{width: "41px"}}>
+          <td style={{width: '41px'}}>
             <ExpanderButton
               expanded={this.props.expanded}
               onClick={() => {
@@ -154,7 +154,7 @@ class Row extends React.Component {
         );
       }
       else {
-        return <td style={{width: "41px"}}/>
+        return <td style={{width: '41px'}}/>
       }
     }
   }
@@ -181,19 +181,19 @@ class Row extends React.Component {
 const ExpanderButton = (props) => {
   return (
       <button
-        className="btn btn-primary btn-xs"
-        style={{width:"22px"}} // keep button from changing width between +/-
+        className='btn btn-primary btn-xs'
+        style={{width:'22px'}} // keep button from changing width between +/-
         onClick={() => props.onClick()}>
-        {props.expanded ? "-" : "+"}
+        {props.expanded ? '-' : '+'}
       </button>
   );
 }
 
 
 const SortArrow = (props) => {
-  var rotate = props.rotate || (props.down ? 90 : -90);
+  const rotate = props.rotate || (props.down ? 90 : -90);
   return (
-    <div style={{WebkitTransform: `rotate(${rotate}deg)`, display: "inline-block", marginLeft: "5px"}}>➜</div>
+    <div style={{WebkitTransform: `rotate(${rotate}deg)`, display: 'inline-block', marginLeft: '5px'}}>➜</div>
   )
 }
 
@@ -215,14 +215,14 @@ const TableHeader = (props) => {
 const SearchBar = (props) => {
   return (
     <form>
-      <div className="form-group" style={props.style}>
-        <div className="input-group">
-          <div className="input-group-addon">
-            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABQ0lEQVQ4T53SvyvtcRzH8Yckg8LAzR/AgNxRke6NgT+AhVIGRkqSge6im+6o3NUgJPcORhaTyGByDUySgYv1DnK7t7c+R9++zjnFd/u+36/P8/3rVeH1V49O1OIKJ/hbRPccqsgkavAN46jOxK8xh81ikAIgHu+jGV/wEw9oxVSCLuBrHlIArGAYXbgoUmkSy+jBYTYfgJj5BjP4XmLW0B0k3WAe0I89NOG21LIwjXk05AFD+IEqPJUBjGI16V5k0Vqc7BgfcVoGsIQo1pLvoBKX2MVECUB44hzrmM0D4n8EG+lkcZF/GVE83sYAOvCrGCBisaBFHCUf3KMNY2nBoTlDH34XIFknRqw7nfMz6tJoO1jDVgIGpBd3eSuX2d9z6kNya3saIzq5y3fwFkhc7NNbAVGgMXUSlxt8DyAgYf8/ePwPza86J6hmCwMAAAAASUVORK5CYII="/>
+      <div className='form-group' style={props.style}>
+        <div className='input-group'>
+          <div className='input-group-addon'>
+            <img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABQ0lEQVQ4T53SvyvtcRzH8Yckg8LAzR/AgNxRke6NgT+AhVIGRkqSge6im+6o3NUgJPcORhaTyGByDUySgYv1DnK7t7c+R9++zjnFd/u+36/P8/3rVeH1V49O1OIKJ/hbRPccqsgkavAN46jOxK8xh81ikAIgHu+jGV/wEw9oxVSCLuBrHlIArGAYXbgoUmkSy+jBYTYfgJj5BjP4XmLW0B0k3WAe0I89NOG21LIwjXk05AFD+IEqPJUBjGI16V5k0Vqc7BgfcVoGsIQo1pLvoBKX2MVECUB44hzrmM0D4n8EG+lkcZF/GVE83sYAOvCrGCBisaBFHCUf3KMNY2nBoTlDH34XIFknRqw7nfMz6tJoO1jDVgIGpBd3eSuX2d9z6kNya3saIzq5y3fwFkhc7NNbAVGgMXUSlxt8DyAgYf8/ePwPza86J6hmCwMAAAAASUVORK5CYII='/>
           </div>
           <input
-            type="text"
-            className="form-control"
+            type='text'
+            className='form-control'
             placeholder={props.placeholder}
             onChange={props.onChange}/>
         </div>
@@ -232,17 +232,17 @@ const SearchBar = (props) => {
 };
 
 SearchBar.defaultProps = {
-  placeholder: "Type to search"
+  placeholder: 'Type to search'
 }
 
 
 const ExportButton = (props) => {
   return (
     <button
-      type="button"
-      className="btn btn-primary btn-sm"
+      type='button'
+      className='btn btn-primary btn-sm'
       onClick={props.onClick}
-      style={{marginRight: "5px"}}>
+      style={{marginRight: '5px'}}>
       Export to {props.format}
     </button>
   );
@@ -251,7 +251,7 @@ const ExportButton = (props) => {
 
 const expandRows = (rows, force) => {
   // recursively expand any collapsed rows
-  var expanded = [];
+  let expanded = [];
   rows.forEach(function(r) {
     expanded.push(r)
     if (r.expanded || force) {
@@ -266,14 +266,14 @@ export class SearchTable extends React.Component {
   constructor(props) {
     super(props);
 
-    var rows = this.init(this.props.rows);
+    const rows = this.init(this.props.rows);
 
     this.state = {
       search: '',
       sortBy: this.props.sortBy || Object.keys(rows[0].cells)[0],
       sortDesc: this.props.sortDesc,
       // This is pretty goofy - since I want to be able to have expandable rows,
-      // I need to keep track of each row"s expanded state on the table, since
+      // I need to keep track of each row's expanded state on the table, since
       // I can't render the expanded child directly from the row component :|
       // Surely there's a better way, but I can't find it
       rows: rows
@@ -287,11 +287,11 @@ export class SearchTable extends React.Component {
         // contain a reference to the parent, and so if any cells contain components
         // such as hyperlinks that update the parent, jsonification will fail
         // due to circular refs.  Let's try to avoid that by ignoring any references
-        // to "_owner"
+        // to '_owner'
         const stringifySafe = (obj) => {
           return JSON.stringify(obj, function(key, val) {
-            if (key == "_owner") {
-              return "owner";
+            if (key == '_owner') {
+              return 'owner';
             }
             return val;
           });
@@ -304,8 +304,8 @@ export class SearchTable extends React.Component {
         }
       } catch (err) {}
 
-      var newRows = this.init(nextProps.rows),
-          newSort = this.state.sortBy;
+      const newRows = this.init(nextProps.rows);
+      let newSort = this.state.sortBy;
 
       if (nextProps.sortBy) {
         newSort = nextProps.sortBy;
@@ -323,7 +323,7 @@ export class SearchTable extends React.Component {
 
   init(rows) {
     // coerce all row definitions to standard format
-    var coercedRows = rows.map(r => CoerceRow(r))
+    const coercedRows = rows.map(r => CoerceRow(r))
 
     // recursively expand any collapsed rows and assign unique indexes
     expandRows(coercedRows, true).forEach(function(r, i) {
@@ -355,19 +355,19 @@ export class SearchTable extends React.Component {
         if (a.cells[this.state.sortBy].sortVal == b.cells[this.state.sortBy].sortVal) {
           return 0;
         }
-        var diff = a.cells[this.state.sortBy].sortVal > b.cells[this.state.sortBy].sortVal ? 1 : -1;
+        const diff = a.cells[this.state.sortBy].sortVal > b.cells[this.state.sortBy].sortVal ? 1 : -1;
         return this.state.sortDesc ? -diff : diff;
       });
     }
   }
 
   filter(rows) {
-    var searchTokens = this.state.search.split(/[ ,]+/),
-        regexes = searchTokens.map(st => new RegExp(st, "gi")),
-        filtered = rows.filter(row =>
-          regexes.every(re =>
-            Object.values(row.cells).some(c =>
-              c.searchTerm.match(re))));
+    const searchTokens = this.state.search.split(/[ ,]+/)
+    const regexes = searchTokens.map(st => new RegExp(st, 'gi'));
+    const filtered = rows.filter(row =>
+            regexes.every(re =>
+              Object.values(row.cells).some(c =>
+                c.searchTerm.match(re))));
     return filtered
   }
 
@@ -376,17 +376,17 @@ export class SearchTable extends React.Component {
   }
 
   renderExportButtons() {
-    var formats = [];
+    const formats = [];
     if (this.props.showExportCSVBtn) {
-      formats.push("CSV")
+      formats.push('CSV')
     }
     if (this.props.showExportJSONBtn) {
-      formats.push("JSON")
+      formats.push('JSON')
     }
 
     if (formats.length) {
       return (
-        <div className="row" style={{margin: "auto"}}>
+        <div className='row' style={{margin: 'auto'}}>
         {
           formats.map((f, i) =>
             <ExportButton
@@ -454,22 +454,22 @@ export class SearchTable extends React.Component {
   }
 
   exportFile(format) {
-    var blob = null,
-        a = document.createElement("a");
+    let blob = null;
+    const a = document.createElement('a');
 
-    if (format == "CSV") {
-      var validRows = this.displayedRows().filter(r => Object.keys(r.cells).join(",") == this.columns.join(",")),
-          dataRows = validRows.map(r => this.columns.map(c => r.cells[c].searchTerm)),
-          rows = [this.columns].concat(dataRows),
-          csv = rows.map(r => r.map(c => `"${c}"`).join(",")).join("\n");
+    if (format == 'CSV') {
+      const validRows = this.displayedRows().filter(r => Object.keys(r.cells).join(',') == this.columns.join(','));
+      const dataRows = validRows.map(r => this.columns.map(c => r.cells[c].searchTerm));
+      const rows = [this.columns].concat(dataRows);
+      const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
 
-      blob = new Blob([csv], {type: "text/csv"});
+      blob = new Blob([csv], {type: 'text/csv'});
     }
     else {
-      blob = new Blob([JSON.stringify(this.props.rows, null, 2)], {type: "text/json"});
+      blob = new Blob([JSON.stringify(this.props.rows, null, 2)], {type: 'text/json'});
     }
 
-    a.download = "table." + (format == "CSV" ? "csv" : "json");
+    a.download = 'table.' + (format == 'CSV' ? 'csv' : 'json');
     a.href = window.URL.createObjectURL(blob);
     a.click();
   }
@@ -477,9 +477,9 @@ export class SearchTable extends React.Component {
 
 
 SearchTable.defaultProps = {
-  className: "table table-bordered table-striped",
-  search: "",
-  searchPrompt: "Type to search",
+  className: 'table table-bordered table-striped',
+  search: '',
+  searchPrompt: 'Type to search',
   showExportCSVBtn: false,
   showExportJSONBtn: false,
   showSearchBar: true
