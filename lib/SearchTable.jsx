@@ -78,40 +78,29 @@ Cell.defaultProperties = {
 }
 
 const CoerceCell = (cell='') => {
-  if (Object.keys(cell).length >= 0) {
-    // dig down to the root for complex cells (e.g., links, etc.)
-    function innermostValue(obj=cell) {
-      try {
-        return innermostValue(obj.props.children);
-      }
-      catch(err) {
-        if (obj == null) return '';
-        else return obj;
-      }
+  // dig down to the root for complex cells (e.g., links, etc.)
+  const innermostValue = (v=cell) => {
+    try {
+      return innermostValue(v.props.children);
     }
-
-    const content = innermostValue(cell.display);
-
-    const coerce = (display=cell, sortVal=content, searchTerm=String(content)) => {
-      return {
-        display: display,
-        searchTerm: searchTerm,
-        sortVal: sortVal,
-        onChange: cell.onChange
-      };
+    catch(err) {
+      if (v == null || (typeof v) === 'object') return '';
+      else return v;
     }
-
-    return coerce(cell.display, cell.sortVal, cell.searchTerm)
   }
-  else {
-    // primitivite type - use the same value for display, search and sort
+
+  const primitive = innermostValue(cell.display);
+
+  const coerce = (display=cell, sortVal=primitive, searchTerm=String(primitive)) => {
     return {
-      display: cell,
-      searchTerm: String(cell),
-      sortVal: cell,
-      onChange: null
+      display: display,
+      searchTerm: searchTerm,
+      sortVal: sortVal,
+      onChange: cell.onChange
     };
   }
+
+  return coerce(cell.display, cell.sortVal, cell.searchTerm)
 }
 
 
@@ -364,11 +353,10 @@ export class SearchTable extends React.Component {
   filter(rows) {
     const searchTokens = this.state.search.split(/[ ,]+/)
     const regexes = searchTokens.map(st => new RegExp(st, 'gi'));
-    const filtered = rows.filter(row =>
+    return rows.filter(row =>
             regexes.every(re =>
               Object.values(row.cells).some(c =>
                 c.searchTerm.match(re))));
-    return filtered
   }
 
   displayedRows() {
@@ -384,19 +372,17 @@ export class SearchTable extends React.Component {
       formats.push('JSON')
     }
 
-    if (formats.length) {
-      return (
-        <div className='row' style={{margin: 'auto'}}>
-        {
-          formats.map((f, i) =>
-            <ExportButton
-              key={i}
-              format={f}
-              onClick={()=>this.exportFile(f)}/>)
-        }
-        </div>
-      );
-    }
+    return (
+      <div className='row' style={{margin: 'auto'}}>
+      {
+        formats.map((f, i) =>
+          <ExportButton
+            key={i}
+            format={f}
+            onClick={()=>this.exportFile(f)}/>)
+      }
+      </div>
+    );
   }
 
   renderSearchBar() {
@@ -455,8 +441,6 @@ export class SearchTable extends React.Component {
 
   exportFile(format) {
     let blob = null;
-    const a = document.createElement('a');
-
     if (format == 'CSV') {
       const validRows = this.displayedRows().filter(r => Object.keys(r.cells).join(',') == this.columns.join(','));
       const dataRows = validRows.map(r => this.columns.map(c => r.cells[c].searchTerm));
@@ -466,9 +450,10 @@ export class SearchTable extends React.Component {
       blob = new Blob([csv], {type: 'text/csv'});
     }
     else {
-      blob = new Blob([JSON.stringify(this.props.rows, null, 2)], {type: 'text/json'});
+      blob = new Blob([JSON.stringify(this.state.rows, null, 2)], {type: 'text/json'});
     }
 
+    const a = document.createElement('a');
     a.download = 'table.' + (format == 'CSV' ? 'csv' : 'json');
     a.href = window.URL.createObjectURL(blob);
     a.click();

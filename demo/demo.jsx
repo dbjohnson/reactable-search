@@ -14,7 +14,10 @@ const rows = [
     },
     children: [{
       cells: {
-        gif: <img src={applegif} style={{display: 'block', margin: 'auto'}}/>
+        gif: {
+          display: <img src={applegif} style={{display: 'block', margin: 'auto'}}/>,
+          searchTerm: 'donald'
+        }
       }},
     ]
   },
@@ -28,7 +31,7 @@ const rows = [
   {
     cells: {
       fruit: 'grapes',
-      price: 2,
+      price: 12,
       quantity: {
         display: 'I\'m editable!',
         onChange: (e) => { console.log('You can watch my changes:', e) }
