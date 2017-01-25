@@ -25,7 +25,7 @@ This React component is a simple live-searchable table with some basic enhanceme
 
 ###Install via npm
 ```bash
-$ npm install --save reactable-search
+$ npm i reactable-search
 ```
 
 ## Usage
@@ -36,7 +36,7 @@ $ npm install --save reactable-search
 import SearchTable from 'reactable-search';
 import ReactDOM from 'react-dom';
 
-var rows = [
+const rows = [
   {a: 1, b: 2},
   {a: 2, b: 3},
   ...
@@ -51,12 +51,12 @@ ReactDOM.render(
 
 
 ###Row details
-Each row can be either a simple JSON object where `key:value` specifies `colname:display`, or contain separate keys for `cells` and `children` for rows that are dynamically expandable.  The value under the `cells` key should be a simple row definition; the value under the `children` key should be a list of child rows.  Note that child rows do not have to share the same columns as parent rows, allowing arbitary DOM to be appended to each row -[see demo](https://dbjohnson.github.io/reactable/demo).
+Each row can be either a simple JSON object where `key:value` specifies `colname:display`, or contain separate keys for `cells` and `children` for rows that are dynamically expandable.  The value under the `cells` key should be a simple row definition; the value under the `children` key should be a list of child rows.  Note that child rows do not have to share the same columns as parent rows, allowing arbitary DOM to be appended to each row - [see demo](https://dbjohnson.github.io/reactable-search/demo).
 
 ####Simple row example
 
 ```js
-var rows = [
+const rows = [
   {a: 1, b: 2},
   {a: 2, b: 3},
   ...
@@ -66,7 +66,7 @@ var rows = [
 ####Exapandable row example
 
 ```js
-var expandableRows = [
+const expandableRows = [
   {
     cells: {a: 1, b: 2}
     children: [{
@@ -80,7 +80,7 @@ var expandableRows = [
 
 ### Cell details
 
-Similar to rows, cell definition may be any valid DOM, or a contain a "rich" definition allowing optional specification of separate values for sorting vs. display, and an `onChange` callback function, which if provided will make the cell editable.
+Cell definitions may be any primitive type or valid DOM, or a contain a "rich" definition allowing optional specification of separate values for display, sorting, search, and an `onChange` callback function, which if provided will make the cell editable.
 
 #### Rich cell example
 ```js
@@ -90,6 +90,7 @@ var rows = [
       fruit: {
         display: <label className="label label-danger">bananas</label>,
         sortVal: 5,
+        searchTerm: bananas,
         onChange: (e) => { console.log('You can watch my changes:', e) }
       },
       price: 5, 
@@ -97,6 +98,3 @@ var rows = [
   }
 ];
 ```
-
-## Disclaimer
-Please be gentle, this is my first React project, my first webpack project, and my first node project.  I'm sure there are many things that should have been differently - please leave feedback!
