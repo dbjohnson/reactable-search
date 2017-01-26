@@ -1,7 +1,7 @@
 module.exports = {
-  entry: "./entry.js",
+  entry: "./demo/demo.jsx",
   output: {
-    path: __dirname,
+    path: "./demo",
     filename: "demo.js"
   },
   module: {
@@ -16,5 +16,5 @@ module.exports = {
         }
       }
     ]
-  },
+  }
 };

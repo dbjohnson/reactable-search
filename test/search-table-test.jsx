@@ -4,14 +4,14 @@ import expect from 'expect';
 import SearchTable from '../lib/SearchTable.jsx';
 
 
-var rows = [
+const rows = [
   {a: 1, b: 2},
   {a: 2, b: 3}
 ]
 
 describe('SearchTable', function () {
   it('renders without problems', function () {
-    var root = TestUtils.renderIntoDocument(React.createElement('SearchTable', {rows: rows}));
+    const root = TestUtils.renderIntoDocument(<SearchTable rows={rows}/>);
     expect(root).toExist();
   });
 });
