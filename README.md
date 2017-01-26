@@ -23,9 +23,14 @@ This React component is a simple live-searchable table with some basic enhanceme
 
 ## Quickstart
 
-###Install via npm
+### Install via npm
 ```bash
 $ npm i reactable-search
+```
+
+### Run demo
+```bash
+$ npm run-script demo
 ```
 
 ## Usage

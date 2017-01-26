@@ -1,3 +1,5 @@
+var webpack = require("webpack");
+
 module.exports = {
   entry: "./reactable-search.js",
   output: {
@@ -46,5 +48,12 @@ module.exports = {
         loader: "url?limit=10000&mimetype=image/svg+xml"
       }
     ]
-  }
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      "process.env": {
+         NODE_ENV: JSON.stringify("production")
+       }
+    })
+  ]
 };
