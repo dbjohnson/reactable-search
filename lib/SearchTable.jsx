@@ -72,7 +72,7 @@ export class Cell extends React.Component {
   }
 }
 
-Cell.defaultProperties = {
+Cell.defaultProps = {
   colSpan: 1,
   rowSpan: 1
 }
@@ -283,7 +283,6 @@ export class SearchTable extends React.Component {
             return val;
           });
         }
-
         if (stringifySafe(nextProps.rows) == stringifySafe(this.props.rows)) {
           return;
         }
@@ -337,11 +336,24 @@ export class SearchTable extends React.Component {
   sort() {
     if (this.state.sortBy) {
       return this.state.rows.sort((a, b) => {
-        if (a.cells[this.state.sortBy].sortVal == b.cells[this.state.sortBy].sortVal) {
-          return 0;
+        const cmp = (a, b) => {
+          if (a == b) return 0;
+          const diff = a > b ? 1 : -1;
+          return this.state.sortDesc ? -diff : diff;
         }
-        const diff = a.cells[this.state.sortBy].sortVal > b.cells[this.state.sortBy].sortVal ? 1 : -1;
-        return this.state.sortDesc ? -diff : diff;
+
+        const ret = cmp(a.cells[this.state.sortBy].sortVal, b.cells[this.state.sortBy].sortVal);
+        // if the sort values are equal, compare the entire row content so we get consistent ordering
+        if (ret == 0) {
+          const wholeRow = (r) => {
+            // use searchTerm since it will always be a string
+            return this.columns.map(c => r.cells[c].searchTerm).join('');
+          }
+          return cmp(wholeRow(a), wholeRow(b));
+        }
+        else {
+          return ret;
+        }
       });
     }
   }
