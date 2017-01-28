@@ -77,7 +77,9 @@ Cell.defaultProps = {
   rowSpan: 1
 }
 
-const CoerceCell = (cell='') => {
+const CoerceCell = (cell) => {
+  cell = cell || '';
+
   // dig down to the root for complex cells (e.g., links, etc.)
   const innermostValue = (v=cell) => {
     try {
