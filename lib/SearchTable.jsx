@@ -110,7 +110,7 @@ const CoerceRow = (row) => {
   const coerce = (cells=row, children=[]) => {
     return {
       children: (children).map(c => CoerceRow(c)),
-      expanded: false,
+      expanded: row.expanded,
       cells: Object.keys(cells).reduce((map, k) => {
         map[k] = CoerceCell(cells[k]);
         return map;
