@@ -60,7 +60,7 @@ ReactDOM.render(
 You may optionally specify separate values for display, search and sort for each cell.  You may also provide an `onChange` callback function, which will cause the cell content to become editable.  
 
 Optional key|description|default
----+-----------+-------
+------------|-----------|-------
 `display`|content to be rendered for display|N/A
 `sortVal`|value to be used for sorting rows.  For example, you may want to provide a formatted date string for display, but sort on the actual `Date` object|`display` (innermost content if `display` is a DOM element)
 `searchTerm`|string value for searching|string value of `display` (innermost content if `display` is a DOM element)
