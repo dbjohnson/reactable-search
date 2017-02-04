@@ -13,7 +13,8 @@ class ContentEditable extends React.Component {
       <div
         onBlur={(e) => this.emitChange(e)}
         contentEditable
-        dangerouslySetInnerHTML={{__html: this.props.html}}/>
+        dangerouslySetInnerHTML={{__html: this.props.html}}
+      />
     );
   }
 
@@ -45,7 +46,8 @@ export class Cell extends React.Component {
         <td {...this.props}>
           <ContentEditable
             html={this.state.edited}
-            onChange={(e) => this.props.onChange(e)}/>
+            onChange={(e) => this.props.onChange(e)}
+          />
         </td>
       );
     }
@@ -53,7 +55,8 @@ export class Cell extends React.Component {
       if (typeof this.props.display === 'string') {
         return (
           <td {...this.props}
-              dangerouslySetInnerHTML={{__html: this.props.display}}/>
+              dangerouslySetInnerHTML={{__html: this.props.display}}
+          />
         );
       }
       else {
@@ -140,7 +143,8 @@ class Row extends React.Component {
               expanded={this.props.expanded}
               onClick={() => {
                 this.props.onExpand(!this.props.expanded);
-              }}/>
+              }}
+            />
           </td>
         );
       }
@@ -215,7 +219,8 @@ const SearchBar = (props) => {
             type='text'
             className='form-control'
             placeholder={props.placeholder}
-            onChange={props.onChange}/>
+            onChange={props.onChange}
+          />
         </div>
       </div>
     </form>
@@ -389,7 +394,8 @@ export class SearchTable extends React.Component {
           <ExportButton
             key={i}
             format={f}
-            onClick={()=>this.exportFile(f)}/>)
+            onClick={()=>this.exportFile(f)}
+          />)
       }
       </div>
     );
@@ -400,7 +406,8 @@ export class SearchTable extends React.Component {
       return (
         <SearchBar
           placeholder={this.props.searchPrompt}
-          onChange={(e) => this.setState({search: e.target.value})}/>
+          onChange={(e) => this.setState({search: e.target.value})}
+        />
       );
     }
   }
@@ -420,7 +427,8 @@ export class SearchTable extends React.Component {
                   col={col}
                   onClick={() => this.setSort(col)}
                   sortBy={col == this.state.sortBy}
-                  sortDesc={this.state.sortDesc}/>)
+                  sortDesc={this.state.sortDesc}
+                />)
               }
             </tr>
           </thead>
