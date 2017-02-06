@@ -85,10 +85,9 @@ const CoerceCell = (cell) => {
 
   // dig down to the root for complex cells (e.g., links, etc.)
   const innermostValue = (v=cell) => {
-    try {
+    if (v.props && v.props.children) {
       return innermostValue(v.props.children);
-    }
-    catch(err) {
+    } else {
       if (v == null || (typeof v) === 'object') return '';
       else return v;
     }
@@ -107,7 +106,6 @@ const CoerceCell = (cell) => {
 
   return coerce(cell.display, cell.sortVal, cell.searchTerm)
 }
-
 
 const CoerceRow = (row) => {
   const coerce = (cells=row, children=[]) => {
@@ -269,7 +267,9 @@ export class SearchTable extends React.Component {
       sortBy: this.props.sortBy || Object.keys(rows[0].cells)[0],
       sortDesc: this.props.sortDesc,
       // part of state to track expanded/collapsed status
-      rows: rows
+      rows: rows,
+      currentPage: 0,
+      numPages: this.props.rowsPerPage ? rows.length / this.props.rowsPerPage : 1
     };
   }
 
@@ -307,7 +307,9 @@ export class SearchTable extends React.Component {
 
       this.setState({
         rows: newRows,
-        sortBy: newSort
+        sortBy: newSort,
+        currentPage: 0,
+        numPages: this.props.rowsPerPage ? newRows.length / this.props.rowsPerPage : 1
       });
     }
   }
@@ -344,9 +346,13 @@ export class SearchTable extends React.Component {
     if (this.state.sortBy) {
       return this.state.rows.sort((a, b) => {
         const cmp = (a, b) => {
-          if (a == b) return 0;
-          const diff = a > b ? 1 : -1;
-          return this.state.sortDesc ? -diff : diff;
+          if (a > b) {
+            return this.state.sortDesc ? -1 : 1;
+          } else if (a < b) {
+            return this.state.sortDesc ? 1 : -1;
+          } else {
+            return 0;
+          }
         }
 
         const ret = cmp(a.cells[this.state.sortBy].sortVal, b.cells[this.state.sortBy].sortVal);
@@ -354,7 +360,7 @@ export class SearchTable extends React.Component {
         if (ret == 0) {
           const wholeRow = (r) => {
             // use searchTerm since it will always be a string
-            return this.columns.map(c => r.cells[c].searchTerm).join('');
+            return this.columns.map(c => r.cells[c].searchTerm || '').join('');
           }
           return cmp(wholeRow(a), wholeRow(b));
         }
@@ -412,6 +418,64 @@ export class SearchTable extends React.Component {
     }
   }
 
+  paginatedRows() {
+    if (this.props.rowsPerPage) {
+      const mn = this.props.rowsPerPage * this.state.currentPage;
+      const mx = mn + this.props.rowsPerPage;
+      const x = this.displayedRows();
+      return x.filter((r, idx) => idx >= mn && idx <= mx);
+      // return this.displayedRows().filter((r, idx) => idx >= mn && idx <= mx);
+    }
+    else {
+      return this.displayedRows();
+    }
+  }
+
+  renderPaginator() {
+    if (this.props.rowsPerPage) {
+      const numPages = this.displayedRows().length / this.props.rowsPerPage;
+      let mn = Math.max(0, this.state.currentPage - this.props.pagesInSelector / 2);
+      let mx = Math.min(numPages - 1, mn + this.props.pagesInSelector);
+      mn = Math.max(0, mx - this.props.pagesInSelector);
+
+      let range = [];
+      let idx = mn
+      while (idx <= mx) {
+        range.push(idx);
+        idx += 1;
+      }
+
+      return (
+        <div style={{float: 'right'}}>
+          <ul className="pagination" style={{marginTop: '0px', marginBottom: '0px'}}>
+            <li
+              className={this.state.currentPage == 0 ? 'disabled' : ''}
+              onClick={() => this.setState({currentPage: Math.max(0, this.state.currentPage - 1)})}
+            >
+              <a>￩ Prev</a>
+            </li>
+
+            {range.map(page =>
+              <li
+                className={this.state.currentPage == page ? 'active' : ''}
+                onClick={() => this.setState({currentPage: page})}
+              >
+                <a>{page + 1}</a>
+              </li>
+            )}
+
+            <li
+              className={this.state.currentPage == numPages - 1 ? 'disabled' : ''}
+              onClick={() => this.setState({currentPage: Math.min(this.state.currentPage + 1, numPages -1)})}
+            >
+              <a>Next ￫</a>
+            </li>
+          </ul>
+        </div>
+      );
+    }
+  }
+
   render() {
     return (
       <div id={this.props.id} className={this.props.class} style={this.props.style}>
@@ -433,7 +497,7 @@ export class SearchTable extends React.Component {
             </tr>
           </thead>
           <tbody>{
-            this.displayedRows().map(r =>
+            this.paginatedRows().map(r =>
               <Row
                 key={r.key}
                 cells={r.cells}
@@ -451,7 +515,7 @@ export class SearchTable extends React.Component {
             )
           }</tbody>
         </table>
-
+        {this.renderPaginator()}
         {this.renderExportButtons()}
       </div>
     );
@@ -485,7 +549,9 @@ SearchTable.defaultProps = {
   searchPrompt: 'Type to search',
   showExportCSVBtn: false,
   showExportJSONBtn: false,
-  showSearchBar: true
+  showSearchBar: true,
+  rowsPerPage: null,
+  pagesInSelector: 10
 };
 
 
