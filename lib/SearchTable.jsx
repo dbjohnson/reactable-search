@@ -216,6 +216,7 @@ const SearchBar = (props) => {
           <input
             type='text'
             className='form-control'
+            value={props.value}
             placeholder={props.placeholder}
             onChange={props.onChange}
           />
@@ -263,7 +264,7 @@ export class SearchTable extends React.Component {
     const rows = this.init(this.props.rows);
 
     this.state = {
-      search: '',
+      search: this.props.initSearch,
       sortBy: this.props.sortBy || Object.keys(rows[0].cells)[0],
       sortDesc: this.props.sortDesc,
       // part of state to track expanded/collapsed status
@@ -306,6 +307,7 @@ export class SearchTable extends React.Component {
       }
 
       this.setState({
+        search: '',
         rows: newRows,
         sortBy: newSort,
         currentPage: 0,
@@ -412,6 +414,7 @@ export class SearchTable extends React.Component {
       return (
         <SearchBar
           placeholder={this.props.searchPrompt}
+          value={this.state.search}
           onChange={(e) => this.setState({search: e.target.value})}
         />
       );
@@ -422,9 +425,7 @@ export class SearchTable extends React.Component {
     if (this.props.rowsPerPage) {
       const mn = this.props.rowsPerPage * this.state.currentPage;
       const mx = mn + this.props.rowsPerPage;
-      const x = this.displayedRows();
-      return x.filter((r, idx) => idx >= mn && idx <= mx);
-      // return this.displayedRows().filter((r, idx) => idx >= mn && idx <= mx);
+      return this.displayedRows().filter((r, idx) => idx >= mn && idx <= mx);
     }
     else {
       return this.displayedRows();
@@ -433,8 +434,8 @@ export class SearchTable extends React.Component {
 
   renderPaginator() {
     if (this.props.rowsPerPage) {
-      const numPages = this.displayedRows().length / this.props.rowsPerPage;
-      let mn = Math.max(0, this.state.currentPage - this.props.pagesInSelector / 2);
+      const numPages = Math.ceil(this.displayedRows().length / this.props.rowsPerPage);
+      let mn = Math.max(0, this.state.currentPage - Math.ceil(this.props.pagesInSelector / 2));
       let mx = Math.min(numPages - 1, mn + this.props.pagesInSelector);
       mn = Math.max(0, mx - this.props.pagesInSelector);
 
@@ -466,7 +467,7 @@ export class SearchTable extends React.Component {
 
             <li
               className={this.state.currentPage == numPages - 1 ? 'disabled' : ''}
-              onClick={() => this.setState({currentPage: Math.min(this.state.currentPage + 1, numPages -1)})}
+              onClick={() => this.setState({currentPage: Math.min(this.state.currentPage + 1, numPages - 1)})}
             >
               <a>Next ￫</a>
             </li>
@@ -545,7 +546,7 @@ export class SearchTable extends React.Component {
 
 SearchTable.defaultProps = {
   className: 'table table-bordered table-striped',
-  search: '',
+  initSearch: '',
   searchPrompt: 'Type to search',
   showExportCSVBtn: false,
   showExportJSONBtn: false,
