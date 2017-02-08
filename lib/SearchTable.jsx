@@ -383,7 +383,7 @@ export class SearchTable extends React.Component {
   }
 
   displayedRows() {
-    return this.filter(expandRows(this.sort()));
+    return expandRows(this.filter(this.sort()));
   }
 
   renderExportButtons() {
