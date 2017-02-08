@@ -10,7 +10,7 @@ const rows = [
     cells: {
       fruit: 'apples',
       price: 8,
-      quantity: 3
+      quantity: 0
     },
     children: [{
       cells: {
