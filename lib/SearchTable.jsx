@@ -85,7 +85,7 @@ const CoerceCell = (cell) => {
 
   // dig down to the root for complex cells (e.g., links, etc.)
   const innermostValue = (v=cell) => {
-    if (v.props && v.props.children) {
+    if (v && v.props && v.props.children) {
       return innermostValue(v.props.children);
     } else {
       if (v == null || (typeof v) === 'object') return '';
