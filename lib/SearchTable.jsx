@@ -435,6 +435,10 @@ export class SearchTable extends React.Component {
   renderPaginator() {
     if (this.props.rowsPerPage) {
       const numPages = Math.ceil(this.displayedRows().length / this.props.rowsPerPage);
+
+      // if there's only one page, get outta here
+      if (numPages < 2) return
+
       let mn = Math.max(0, this.state.currentPage - Math.ceil(this.props.pagesInSelector / 2));
       let mx = Math.min(numPages - 1, mn + this.props.pagesInSelector);
       mn = Math.max(0, mx - this.props.pagesInSelector);
