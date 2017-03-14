@@ -106,6 +106,7 @@ const expandableRows = [
 
 Optional key|description|default
 ------------|-----------|-------
+`key`|row id provided in `onRender` callback (if provided) for currently displayed rows|N/A
 `cells`|see cell definition above|N/A
 `children`|List of child rows| `[]`
 `expanded`|Whether to expand all child rows by default|`false`

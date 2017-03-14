@@ -7,6 +7,7 @@ const applegif = 'http://i.giphy.com/wJRhcjWc7fKIE.gif';
 
 const rows = [
   {
+    key: 'apples',
     cells: {
       fruit: 'apples',
       price: 8,
@@ -23,6 +24,7 @@ const rows = [
     ]
   },
   {
+    key: 'bananas',
     cells: {
       fruit: <a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>,
       price: 5,
@@ -30,6 +32,7 @@ const rows = [
     }
   },
   {
+    key: 'grapes',
     cells: {
       fruit: 'grapes',
       price: 12,
@@ -50,6 +53,7 @@ const DemoTable = (props) => {
         searchPrompt='Type to search'
         showExportCSVBtn={true}
         showExportJSONBtn={true}
+        onRender={(rowkeys) => console.log(rowkeys)}
         className='table table-bordered table-striped'/>
     </div>
   )

@@ -113,6 +113,7 @@ const CoerceRow = (row) => {
       children: (children).map(c => CoerceRow(c)),
       expanded: row.expanded,
       onClick: row.onClick,
+      userKey: row.key,
       cells: Object.keys(cells).reduce((map, k) => {
         map[k] = CoerceCell(cells[k]);
         return map;
@@ -494,6 +495,10 @@ export class SearchTable extends React.Component {
   }
 
   render() {
+    if (this.props.onRender) {
+      this.props.onRender(this.displayedRows().map(r => r.userKey))
+    }
+
     return (
       <div id={this.props.id} className={this.props.class} style={this.props.style}>
         {this.renderSearchBar()}
