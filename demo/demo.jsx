@@ -8,12 +8,12 @@ const applegif = 'http://i.giphy.com/wJRhcjWc7fKIE.gif';
 const rows = [
   {
     key: 'apples',
+    onClick: (selected) => console.log('selected:', selected),
     cells: {
       fruit: 'apples',
       price: 8,
       quantity: 0
     },
-    onClick: (selected) => console.log('selected:', selected),
     children: [{
       cells: {
         gif: {
