@@ -153,8 +153,18 @@ class Row extends React.Component {
   }
 
   render() {
+    let onClick = null;
+    let rowClass = null;
+
+    if (this.props.onClick) {
+      onClick = () => this.props.onClick(!this.props.selected)
+      rowClass = 'clickable-row';
+      if (this.props.selected) {
+        rowClass += ' info'
+      }
+    }
     return (
-      <tr>
+      <tr className={rowClass} onClick={onClick}>
         {this.renderExpander()}
         {
           Object.values(this.props.cells).map((c, j) =>
@@ -269,6 +279,7 @@ export class SearchTable extends React.Component {
       sortDesc: this.props.sortDesc,
       // part of state to track expanded/collapsed status
       rows: rows,
+      selectedRow: null,
       currentPage: 0,
       numPages: this.props.rowsPerPage ? rows.length / this.props.rowsPerPage : 1
     };
@@ -514,6 +525,19 @@ export class SearchTable extends React.Component {
                   (ex) => {
                     r.expanded = ex;
                     this.setState({rows: this.state.rows})
+                  }
+                }
+                selected={this.state.selectedRow == r}
+                onClick={
+                  (selected) => {
+                    if (this.props.onRowSelected) {
+                      if (selected) {
+                        this.props.onRowSelected(r);
+                      }
+                      this.setState({
+                        selectedRow: selected ? r : null
+                      })
+                    }
                   }
                 }
               />

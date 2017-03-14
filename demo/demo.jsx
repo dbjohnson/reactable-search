@@ -49,6 +49,7 @@ const DemoTable = (props) => {
         searchPrompt='Type to search'
         showExportCSVBtn={true}
         showExportJSONBtn={true}
+        onRowSelected={(row) => console.log('selected', row) }
         className='table table-bordered table-striped'/>
     </div>
   )
