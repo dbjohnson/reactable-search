@@ -112,6 +112,7 @@ const CoerceRow = (row) => {
     return {
       children: (children).map(c => CoerceRow(c)),
       expanded: row.expanded,
+      onClick: row.onClick,
       cells: Object.keys(cells).reduce((map, k) => {
         map[k] = CoerceCell(cells[k]);
         return map;
@@ -530,10 +531,8 @@ export class SearchTable extends React.Component {
                 selected={this.state.selectedRow == r}
                 onClick={
                   (selected) => {
-                    if (this.props.onRowSelected) {
-                      if (selected) {
-                        this.props.onRowSelected(r);
-                      }
+                    if (r.onClick) {
+                      r.onClick(selected);
                       this.setState({
                         selectedRow: selected ? r : null
                       })

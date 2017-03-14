@@ -12,11 +12,12 @@ const rows = [
       price: 8,
       quantity: 0
     },
+    onClick: (selected) => console.log('selected:', selected),
     children: [{
       cells: {
         gif: {
           display: <img src={applegif} style={{display: 'block', margin: 'auto'}}/>,
-          searchTerm: 'donald'
+          searchTerm: 'donald',
         }
       }},
     ]
@@ -49,7 +50,6 @@ const DemoTable = (props) => {
         searchPrompt='Type to search'
         showExportCSVBtn={true}
         showExportJSONBtn={true}
-        onRowSelected={(row) => console.log('selected', row) }
         className='table table-bordered table-striped'/>
     </div>
   )
