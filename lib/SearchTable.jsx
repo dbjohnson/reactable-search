@@ -112,7 +112,10 @@ const CoerceRow = (row) => {
     return {
       children: (children).map(c => CoerceRow(c)),
       expanded: row.expanded,
+      checked: row.checked,
+      selected: row.selected,
       onClick: row.onClick,
+      onCheck: row.onCheck,
       userKey: row.key,
       cells: Object.keys(cells).reduce((map, k) => {
         map[k] = CoerceCell(cells[k]);
@@ -131,18 +134,34 @@ class Row extends React.Component {
     // Child rows may not have the same column set as top-level rows.
     // When this is the case, adjust the colspan to automatically distribute
     // cells across the entire table width
-    this.colSpan = this.props.tableWidthCols / Object.keys(this.props.cells).length
+    this.colSpan = this.props.tableWidthCols / Object.keys(this.props.content.cells).length
+  }
+
+  renderCheckBox() {
+    if (this.props.onCheck) {
+      return (
+        <td>
+          <input
+            type='checkbox'
+            checked={this.props.content.checked}
+            onChange={(e) => {
+              this.props.onCheck(e.target.checked);
+            }}
+          />
+        </td>
+      )
+    }
   }
 
   renderExpander() {
     if (this.props.expanderCol) {
-      if (this.props.expanderBtn) {
+      if (this.props.content.children.length > 0) {
         return (
           <td style={{width: '41px'}}>
             <ExpanderButton
-              expanded={this.props.expanded}
+              expanded={this.props.content.expanded}
               onClick={() => {
-                this.props.onExpand(!this.props.expanded);
+                this.props.onExpand(!this.props.content.expanded);
               }}
             />
           </td>
@@ -167,9 +186,10 @@ class Row extends React.Component {
     }
     return (
       <tr className={rowClass} onClick={onClick}>
+        {this.renderCheckBox()}
         {this.renderExpander()}
         {
-          Object.values(this.props.cells).map((c, j) =>
+          Object.values(this.props.content.cells).map((c, j) =>
             <Cell
               key={j}
               display={c.display}
@@ -279,6 +299,7 @@ export class SearchTable extends React.Component {
       search: this.props.initSearch,
       sortBy: this.props.sortBy || Object.keys(rows[0].cells)[0],
       sortDesc: this.props.sortDesc,
+      showTickedOnly: this.props.showTickedOnly,
       // part of state to track expanded/collapsed status
       rows: rows,
       selectedRow: null,
@@ -320,12 +341,12 @@ export class SearchTable extends React.Component {
       }
 
       this.setState({
-        search: '',
         rows: newRows,
         sortBy: newSort,
-        currentPage: 0,
         numPages: this.props.rowsPerPage ? newRows.length / this.props.rowsPerPage : 1
       });
+
+      this.forceUpdate();
     }
   }
 
@@ -388,11 +409,18 @@ export class SearchTable extends React.Component {
 
   filter(rows) {
     const searchTokens = this.state.search.split(/[ ,]+/)
-    const regexes = searchTokens.map(st => new RegExp(st, 'gi'));
+    const regexes = searchTokens.map(st => {
+      try {
+        return new RegExp(st, 'gi');
+      } catch(Error) {
+        return '';
+      }
+    });
     return rows.filter(row =>
-            regexes.every(re =>
-              Object.values(row.cells).some(c =>
-                c.searchTerm.match(re))));
+            row.checked || !this.state.showTickedOnly).filter(row =>
+              regexes.every(re =>
+                Object.values(row.cells).some(c =>
+                  c.searchTerm.match(re))));
   }
 
   displayedRows() {
@@ -428,20 +456,23 @@ export class SearchTable extends React.Component {
         <SearchBar
           placeholder={this.props.searchPrompt}
           value={this.state.search}
-          onChange={(e) => this.setState({search: e.target.value})}
+          onChange={(e) => {
+            this.setState({search: e.target.value})
+          }}
         />
       );
     }
   }
 
   paginatedRows() {
-    if (this.props.rowsPerPage) {
+    const allRows = this.displayedRows()
+    if (this.props.rowsPerPage && allRows.length > this.props.rowsPerPage) {
       const mn = this.props.rowsPerPage * this.state.currentPage;
       const mx = mn + this.props.rowsPerPage;
-      return this.displayedRows().filter((r, idx) => idx >= mn && idx <= mx);
+      return allRows.filter((r, idx) => idx >= mn && idx < mx);
     }
     else {
-      return this.displayedRows();
+      return allRows;
     }
   }
 
@@ -468,9 +499,15 @@ export class SearchTable extends React.Component {
           <ul className="pagination" style={{marginTop: '0px', marginBottom: '0px'}}>
             <li
               className={this.state.currentPage == 0 ? 'disabled' : ''}
+              onClick={() => this.setState({currentPage: 0})}
+            >
+              <a>‹‹</a>
+            </li>
+            <li
+              className={this.state.currentPage == 0 ? 'disabled' : ''}
               onClick={() => this.setState({currentPage: Math.max(0, this.state.currentPage - 1)})}
             >
-              <a>￩ Prev</a>
+              <a>‹</a>
             </li>
 
             {range.map(page =>
@@ -480,32 +517,110 @@ export class SearchTable extends React.Component {
               >
                 <a>{page + 1}</a>
               </li>
+
             )}
 
             <li
               className={this.state.currentPage == numPages - 1 ? 'disabled' : ''}
               onClick={() => this.setState({currentPage: Math.min(this.state.currentPage + 1, numPages - 1)})}
             >
-              <a>Next ￫</a>
+              <a>›</a>
             </li>
+
+            <li
+              className={this.state.currentPage == numPages -1 ? 'disabled' : ''}
+              onClick={() => this.setState({currentPage: numPages -1})}
+            >
+              <a>››</a>
+            </li>
+
           </ul>
         </div>
       );
     }
   }
 
+  renderCheckAllBox() {
+    if (this.props.selectionCheckboxes) {
+      return (
+        <td>
+          <input
+            type='checkbox'
+            checked={this.state.allChecked}
+            onChange={(e) => {
+              this.filter(this.state.rows).forEach(r => {
+                r.checked = e.target.checked;
+                if (r.onCheck) {
+                  r.onCheck(e.target.checked);
+                }
+              });
+              this.setState({
+                allChecked: e.target.checked
+              });
+            }}
+          />
+        </td>
+      )
+    }
+  }
+
+  renderExpandAllBox() {
+    if (this.expandable) {
+      return (
+        <td style={{width: '41px'}}>
+          <ExpanderButton
+            expanded={this.state.allExpanded}
+            onClick={() => {
+              this.state.rows.forEach(r => {
+                r.expanded = !this.state.allExpanded
+              });
+              this.setState({
+                allExpanded: !this.state.allExpanded
+              });
+            }}
+          />
+        </td>
+      );
+    }
+  }
+
+  renderShowCheckedBox() {
+    if (this.props.selectionCheckboxes) {
+      return (
+        <label style={{fontWeight: 'normal'}}>
+          <input
+            type='checkbox'
+            style={{marginLeft: '2px'}}
+            checked={this.state.showTickedOnly}
+            onChange={(e) => {
+              this.setState({
+                showTickedOnly: e.target.checked,
+              });
+            }}
+          />
+          Show ticked rows only
+        </label>
+      )
+    }
+  }
+
   render() {
-    if (this.props.onRender) {
-      this.props.onRender(this.displayedRows().map(r => r.userKey))
+    if (this.props.searchChangeCallback) {
+      this.props.searchChangeCallback(
+        this.state.search,
+        this.filter(this.state.rows).map(r => r.userKey)
+      )
     }
 
     return (
       <div id={this.props.id} className={this.props.class} style={this.props.style}>
         {this.renderSearchBar()}
+        {this.renderShowCheckedBox()}
         <table className={this.props.className}>
           <thead>
             <tr>
-              {this.expandable ? <th/> : null}
+              {this.renderCheckAllBox()}
+              {this.renderExpandAllBox()}
               {
               this.columns.map(col =>
                 <TableHeader
@@ -522,15 +637,13 @@ export class SearchTable extends React.Component {
             this.paginatedRows().map(r =>
               <Row
                 key={r.key}
-                cells={r.cells}
+                content={r}
                 tableWidthCols={this.columns.length}
-                expanded={r.expanded}
                 expanderCol={this.expandable}
-                expanderBtn={r.children.length > 0}
                 onExpand={
                   (ex) => {
                     r.expanded = ex;
-                    this.setState({rows: this.state.rows})
+                    this.forceUpdate()
                   }
                 }
                 selected={this.state.selectedRow == r}
@@ -543,6 +656,16 @@ export class SearchTable extends React.Component {
                       })
                     }
                   }
+                }
+                onCheck={
+                  this.props.selectionCheckboxes ?
+                    (checked) => {
+                      if (r.onCheck) {
+                        r.onCheck(checked);
+                      }
+                      r.checked = checked;
+                      this.forceUpdate()
+                    } : null
                 }
               />
             )
