@@ -343,6 +343,7 @@ export class SearchTable extends React.Component {
       this.setState({
         rows: newRows,
         sortBy: newSort,
+        selectedRow: newRows.find(r => r.selected),
         numPages: this.props.rowsPerPage ? newRows.length / this.props.rowsPerPage : 1
       });
 
