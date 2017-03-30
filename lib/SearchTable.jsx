@@ -480,6 +480,12 @@ export class SearchTable extends React.Component {
     if (this.props.rowsPerPage) {
       const numPages = Math.ceil(this.displayedRows().length / this.props.rowsPerPage);
 
+      if (this.state.currentPage >= numPages) {
+        this.setState({
+          currentPage: 0
+        });
+      }
+
       // if there's only one page, get outta here
       if (numPages < 2) return
 
@@ -650,9 +656,9 @@ export class SearchTable extends React.Component {
                 onClick={
                   (selected) => {
                     if (r.onClick) {
-                      r.onClick(selected);
+                      r.onClick();
                       this.setState({
-                        selectedRow: selected ? r : null
+                        selectedRow: r
                       })
                     }
                   }
