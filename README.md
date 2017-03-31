@@ -84,10 +84,10 @@ var rows = [
 ];
 ```
 
-###Expandable rows
+### Expandable rows
 Each row can be either a simple JSON object with `column:cell` key-value pairs, or contain separate keys for `cells` and `children` for rows that are dynamically expandable.  The `children` key should point to a list of child rows that will be shown when the expander button is clicked.  Note that child rows do not have to share the same columns as parent rows, allowing arbitary DOM to be appended to each row - [see demo](https://dbjohnson.github.io/reactable-search/demo).
 
-####Expandable row example
+#### Expandable row example
 
 ```js
 const expandableRows = [
