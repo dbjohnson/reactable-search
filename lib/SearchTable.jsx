@@ -480,7 +480,7 @@ export class SearchTable extends React.Component {
   renderPaginator() {
     if (this.props.rowsPerPage) {
       const numPages = Math.ceil(this.displayedRows().length / this.props.rowsPerPage);
-      const currentPage = Math.min(currentPage, numPages - 1);
+      const currentPage = Math.min(this.state.currentPage, numPages - 1);
 
       // if there's only one page, get outta here
       if (numPages < 2) return
@@ -531,7 +531,7 @@ export class SearchTable extends React.Component {
 
             <li
               className={currentPage == numPages -1 ? 'disabled' : ''}
-              onClick={() => this.setState({currentPage: numPages -1})}
+              onClick={() => this.setState({currentPage: numPages - 1})}
             >
               <a>››</a>
             </li>

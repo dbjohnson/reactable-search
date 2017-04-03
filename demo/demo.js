@@ -26010,7 +26010,7 @@
 					var t = this;if (this.props.rowsPerPage) {
 						var e = function () {
 							var e = Math.ceil(t.displayedRows().length / t.props.rowsPerPage),
-							    n = Math.min(n, e - 1);if (e < 2) return { v: void 0 };var o = Math.max(0, n - Math.ceil(t.props.pagesInSelector / 2)),
+							    n = Math.min(t.state.currentPage, e - 1);if (e < 2) return { v: void 0 };var o = Math.max(0, n - Math.ceil(t.props.pagesInSelector / 2)),
 							    r = Math.min(e - 1, o + t.props.pagesInSelector);o = Math.max(0, r - t.props.pagesInSelector);for (var i = [], a = o; a <= r;) {
 								i.push(a), a += 1;
 							}return { v: _.default.createElement("div", { style: { float: "right" } }, _.default.createElement("ul", { className: "pagination", style: { marginTop: "0px", marginBottom: "0px" } }, _.default.createElement("li", { className: 0 == n ? "disabled" : "", onClick: function onClick() {
