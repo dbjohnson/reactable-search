@@ -480,17 +480,12 @@ export class SearchTable extends React.Component {
   renderPaginator() {
     if (this.props.rowsPerPage) {
       const numPages = Math.ceil(this.displayedRows().length / this.props.rowsPerPage);
-
-      if (this.state.currentPage >= numPages) {
-        this.setState({
-          currentPage: 0
-        });
-      }
+      const currentPage = Math.min(currentPage, numPages - 1);
 
       // if there's only one page, get outta here
       if (numPages < 2) return
 
-      let mn = Math.max(0, this.state.currentPage - Math.ceil(this.props.pagesInSelector / 2));
+      let mn = Math.max(0, currentPage - Math.ceil(this.props.pagesInSelector / 2));
       let mx = Math.min(numPages - 1, mn + this.props.pagesInSelector);
       mn = Math.max(0, mx - this.props.pagesInSelector);
 
@@ -505,21 +500,21 @@ export class SearchTable extends React.Component {
         <div style={{float: 'right'}}>
           <ul className="pagination" style={{marginTop: '0px', marginBottom: '0px'}}>
             <li
-              className={this.state.currentPage == 0 ? 'disabled' : ''}
+              className={currentPage == 0 ? 'disabled' : ''}
               onClick={() => this.setState({currentPage: 0})}
             >
               <a>‹‹</a>
             </li>
             <li
-              className={this.state.currentPage == 0 ? 'disabled' : ''}
-              onClick={() => this.setState({currentPage: Math.max(0, this.state.currentPage - 1)})}
+              className={currentPage == 0 ? 'disabled' : ''}
+              onClick={() => this.setState({currentPage: Math.max(0, currentPage - 1)})}
             >
               <a>‹</a>
             </li>
 
             {range.map(page =>
               <li
-                className={this.state.currentPage == page ? 'active' : ''}
+                className={currentPage == page ? 'active' : ''}
                 onClick={() => this.setState({currentPage: page})}
               >
                 <a>{page + 1}</a>
@@ -528,14 +523,14 @@ export class SearchTable extends React.Component {
             )}
 
             <li
-              className={this.state.currentPage == numPages - 1 ? 'disabled' : ''}
-              onClick={() => this.setState({currentPage: Math.min(this.state.currentPage + 1, numPages - 1)})}
+              className={currentPage == numPages - 1 ? 'disabled' : ''}
+              onClick={() => this.setState({currentPage: Math.min(currentPage + 1, numPages - 1)})}
             >
               <a>›</a>
             </li>
 
             <li
-              className={this.state.currentPage == numPages -1 ? 'disabled' : ''}
+              className={currentPage == numPages -1 ? 'disabled' : ''}
               onClick={() => this.setState({currentPage: numPages -1})}
             >
               <a>››</a>

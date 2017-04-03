@@ -26009,20 +26009,21 @@
 				} }, { key: "renderPaginator", value: function value() {
 					var t = this;if (this.props.rowsPerPage) {
 						var e = function () {
-							var e = Math.ceil(t.displayedRows().length / t.props.rowsPerPage);if (t.state.currentPage >= e && t.setState({ currentPage: 0 }), e < 2) return { v: void 0 };var n = Math.max(0, t.state.currentPage - Math.ceil(t.props.pagesInSelector / 2)),
-							    o = Math.min(e - 1, n + t.props.pagesInSelector);n = Math.max(0, o - t.props.pagesInSelector);for (var r = [], i = n; i <= o;) {
-								r.push(i), i += 1;
-							}return { v: _.default.createElement("div", { style: { float: "right" } }, _.default.createElement("ul", { className: "pagination", style: { marginTop: "0px", marginBottom: "0px" } }, _.default.createElement("li", { className: 0 == t.state.currentPage ? "disabled" : "", onClick: function onClick() {
+							var e = Math.ceil(t.displayedRows().length / t.props.rowsPerPage),
+							    n = Math.min(n, e - 1);if (e < 2) return { v: void 0 };var o = Math.max(0, n - Math.ceil(t.props.pagesInSelector / 2)),
+							    r = Math.min(e - 1, o + t.props.pagesInSelector);o = Math.max(0, r - t.props.pagesInSelector);for (var i = [], a = o; a <= r;) {
+								i.push(a), a += 1;
+							}return { v: _.default.createElement("div", { style: { float: "right" } }, _.default.createElement("ul", { className: "pagination", style: { marginTop: "0px", marginBottom: "0px" } }, _.default.createElement("li", { className: 0 == n ? "disabled" : "", onClick: function onClick() {
 										return t.setState({ currentPage: 0 });
-									} }, _.default.createElement("a", null, "‹‹")), _.default.createElement("li", { className: 0 == t.state.currentPage ? "disabled" : "", onClick: function onClick() {
-										return t.setState({ currentPage: Math.max(0, t.state.currentPage - 1) });
-									} }, _.default.createElement("a", null, "‹")), r.map(function (e) {
-									return _.default.createElement("li", { className: t.state.currentPage == e ? "active" : "", onClick: function onClick() {
+									} }, _.default.createElement("a", null, "‹‹")), _.default.createElement("li", { className: 0 == n ? "disabled" : "", onClick: function onClick() {
+										return t.setState({ currentPage: Math.max(0, n - 1) });
+									} }, _.default.createElement("a", null, "‹")), i.map(function (e) {
+									return _.default.createElement("li", { className: n == e ? "active" : "", onClick: function onClick() {
 											return t.setState({ currentPage: e });
 										} }, _.default.createElement("a", null, e + 1));
-								}), _.default.createElement("li", { className: t.state.currentPage == e - 1 ? "disabled" : "", onClick: function onClick() {
-										return t.setState({ currentPage: Math.min(t.state.currentPage + 1, e - 1) });
-									} }, _.default.createElement("a", null, "›")), _.default.createElement("li", { className: t.state.currentPage == e - 1 ? "disabled" : "", onClick: function onClick() {
+								}), _.default.createElement("li", { className: n == e - 1 ? "disabled" : "", onClick: function onClick() {
+										return t.setState({ currentPage: Math.min(n + 1, e - 1) });
+									} }, _.default.createElement("a", null, "›")), _.default.createElement("li", { className: n == e - 1 ? "disabled" : "", onClick: function onClick() {
 										return t.setState({ currentPage: e - 1 });
 									} }, _.default.createElement("a", null, "››")))) };
 						}();if ("object" === ("undefined" == typeof e ? "undefined" : (0, d.default)(e))) return e.v;
