@@ -107,10 +107,11 @@ const CoerceCell = (cell) => {
   return coerce(cell.display, cell.sortVal, cell.searchTerm)
 }
 
-const CoerceRow = (row) => {
+const CoerceRow = (row, order) => {
   const coerce = (cells=row, children=[]) => {
     return {
-      children: (children).map(c => CoerceRow(c)),
+      children: (children).map(c => CoerceRow(c, order)),
+      order: order,
       expanded: row.expanded,
       checked: row.checked,
       selected: row.selected,
@@ -353,7 +354,7 @@ export class SearchTable extends React.Component {
 
   init(rows) {
     // coerce all row definitions to standard format
-    const coercedRows = rows.map(r => CoerceRow(r))
+    const coercedRows = rows.map((r, i) => CoerceRow(r, i))
 
     // recursively expand any collapsed rows and assign unique indexes
     expandRows(coercedRows, true).forEach(function(r, i) {
@@ -470,7 +471,7 @@ export class SearchTable extends React.Component {
     if (this.props.rowsPerPage && allRows.length > this.props.rowsPerPage) {
       const mn = this.props.rowsPerPage * this.state.currentPage;
       const mx = mn + this.props.rowsPerPage;
-      return allRows.filter((r, idx) => idx >= mn && idx < mx);
+      return allRows.filter(r => r.order >= mn && r.order < mx);
     }
     else {
       return allRows;
