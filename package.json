@@ -5,7 +5,7 @@
     "type": "git",
     "url": "git+https://github.com/dbjohnson/reactable-search.git"
   },
-  "version": "0.2.36",
+  "version": "0.2.37",
   "dependencies": {
     "bootstrap": "^3.3.7",
     "jquery": "^3.1.1",

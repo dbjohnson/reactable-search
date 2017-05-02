@@ -28,7 +28,7 @@ const rows = [
     cells: {
       fruit: <a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>,
       price: 5,
-      quantity: 2
+      quantity: 0
     }
   },
   {
@@ -54,7 +54,8 @@ const DemoTable = (props) => {
         showExportCSVBtn={true}
         showExportJSONBtn={true}
         onRender={(rowkeys) => console.log(rowkeys)}
-        className='table table-bordered table-striped'/>
+        className='table table-bordered table-striped'
+        totalsRow={true}/>
     </div>
   )
 };

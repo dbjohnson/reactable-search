@@ -86,7 +86,7 @@ const CoerceCell = (cell) => {
 
   // dig down to the root for complex cells (e.g., links, etc.)
   const innermostValue = (v=cell) => {
-    if (v && v.props && v.props.children) {
+    if (v && v.props && v.props.children != null) {
       return innermostValue(v.props.children);
     } else {
       if (v == null || (typeof v) === 'object') return '';
@@ -622,7 +622,7 @@ export class SearchTable extends React.Component {
         } else {
           totals[c] = null;
         }
-      })
+      });
 
       if (Object.keys(totals).length > 0) {
         return(
