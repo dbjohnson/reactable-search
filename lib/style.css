@@ -1,0 +1,11 @@
+.totalsRow > td {
+  font-weight: bold;
+}
+
+.totalsRow {
+  background-color: white;
+  border-left: 0px !important;
+  border-right: 0px !important;
+  border-bottom: 0px !important;
+  border-top: solid lightgrey 2px;
+}

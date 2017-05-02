@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+require('./style.css');
 
 
 class ContentEditable extends React.Component {
@@ -175,15 +176,16 @@ class Row extends React.Component {
 
   render() {
     let onClick = null;
-    let rowClass = null;
+    let rowClass = this.props.className || '';
 
     if (this.props.onClick) {
       onClick = () => this.props.onClick(!this.props.selected)
-      rowClass = 'clickable-row';
+      rowClass += ' clickable-row';
       if (this.props.selected) {
-        rowClass += ' info'
+        rowClass += ' info';
       }
     }
+
     return (
       <tr className={rowClass} onClick={onClick}>
         {this.renderCheckBox()}
@@ -606,6 +608,36 @@ export class SearchTable extends React.Component {
     }
   }
 
+  renderTotalsRow() {
+    if (this.props.totalsRow) {
+      const isNumeric = (n) => {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+      }
+
+      let totals = {}
+      this.columns.forEach(c => {
+        const values = this.paginatedRows().map(r => r.cells[c].sortVal);
+        if (values.some(isNumeric)) {
+          totals[c] = values.reduce((l, r) => isNumeric(r) ? l + parseFloat(r) : l, 0);
+        } else {
+          totals[c] = null;
+        }
+      })
+
+      if (Object.keys(totals).length > 0) {
+        return(
+          <Row
+            key='totals'
+            content={CoerceRow(totals)}
+            tableWidthCols={this.columns.length}
+            expanderCol={this.expandable}
+            className={this.props.totalsRowClass}
+          />
+        );
+      }
+    }
+  }
+
   render() {
     if (this.props.searchChangeCallback) {
       this.props.searchChangeCallback(
@@ -671,7 +703,9 @@ export class SearchTable extends React.Component {
                 }
               />
             )
-          }</tbody>
+          }
+          {this.renderTotalsRow()}
+          </tbody>
         </table>
         {this.renderPaginator()}
         {this.renderExportButtons()}
@@ -709,7 +743,9 @@ SearchTable.defaultProps = {
   showExportJSONBtn: false,
   showSearchBar: true,
   rowsPerPage: null,
-  pagesInSelector: 10
+  pagesInSelector: 10,
+  totalsRow: false,
+  totalsRowClass: 'totalsRow'
 };
 
 
