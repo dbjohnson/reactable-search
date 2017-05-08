@@ -41,6 +41,14 @@ export class Cell extends React.Component {
     }
   }
 
+  componentWillReceiveProps(newProps) {
+    if (this.props.onChange) {
+      this.setState({
+        edited: newProps.display
+      });
+    }
+  }
+
   render() {
     if (this.props.onChange) {
       return (
