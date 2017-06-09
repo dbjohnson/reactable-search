@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-require('./style.css');
 
 
 class ContentEditable extends React.Component {
