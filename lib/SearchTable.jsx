@@ -104,12 +104,11 @@ const CoerceCell = (cell) => {
   const primitive = innermostValue(cell.display);
 
   const coerce = (display=cell, sortVal=primitive, searchTerm=String(primitive)) => {
-    return {
+    return Object.assign({
       display: display,
       searchTerm: searchTerm,
       sortVal: sortVal,
-      onChange: cell.onChange
-    };
+    }, cell);
   }
 
   return coerce(cell.display, cell.sortVal, cell.searchTerm)
@@ -117,19 +116,13 @@ const CoerceCell = (cell) => {
 
 const CoerceRow = (row) => {
   const coerce = (cells=row, children=[]) => {
-    return {
+    return Object.assign(row, {
       children: (children).map(c => CoerceRow(c)),
-      expanded: row.expanded,
-      checked: row.checked,
-      selected: row.selected,
-      onClick: row.onClick,
-      onCheck: row.onCheck,
-      userKey: row.key,
       cells: Object.keys(cells).reduce((map, k) => {
         map[k] = CoerceCell(cells[k]);
         return map;
       }, {})
-    }
+    });
   }
   return coerce(row.cells, row.children);
 }
@@ -391,6 +384,12 @@ export class SearchTable extends React.Component {
   sort() {
     if (this.state.sortBy) {
       return this.state.rows.sort((a, b) => {
+        if (a.footer) {
+          return 1;
+        } else if (b.footer) {
+          return -1;
+        }
+
         const cmp = (a, b) => {
           if (a > b) {
             return this.state.sortDesc ? -1 : 1;
@@ -427,10 +426,12 @@ export class SearchTable extends React.Component {
       }
     });
     return rows.filter(row =>
-            row.checked || !this.state.showTickedOnly).filter(row =>
-              regexes.every(re =>
-                Object.values(row.cells).some(c =>
-                  c.searchTerm.match(re))));
+      row.footer ||
+      row.checked || !this.state.showTickedOnly
+    ).filter(row =>
+      regexes.every(re =>
+        Object.values(row.cells).some(c =>
+          c.searchTerm.match(re))));
   }
 
   displayedRows() {
@@ -687,14 +688,15 @@ export class SearchTable extends React.Component {
                     this.forceUpdate()
                   }
                 }
-                selected={this.state.selectedRow == r}
+                selected={r == this.state.selectedRow}
                 onClick={
                   (selected) => {
                     if (r.onClick) {
-                      r.onClick();
+                      r.onClick(selected);
+                    } else {
                       this.setState({
-                        selectedRow: r
-                      })
+                        selectedRow: r == this.state.selectedRow ? null : r
+                      });
                     }
                   }
                 }

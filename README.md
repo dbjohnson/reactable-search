@@ -110,5 +110,8 @@ Optional key|description|default
 `cells`|see cell definition above|N/A
 `children`|List of child rows| `[]`
 `expanded`|Whether to expand all child rows by default|`false`
-
-
+`checked`|checkbox selection status|null
+`selected`|row selection status|false
+`onClick`| click callback fn|null
+`onCheck`| checkbox callback fn|null
+`footer`|always at the bottom, regardless of search or sort|false 

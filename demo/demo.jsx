@@ -8,7 +8,6 @@ const applegif = 'http://i.giphy.com/wJRhcjWc7fKIE.gif';
 const rows = [
   {
     key: 'apples',
-    onClick: (selected) => console.log('selected:', selected),
     cells: {
       fruit: 'apples',
       price: 8,
@@ -40,6 +39,15 @@ const rows = [
         display: 'I\'m editable!',
         onChange: (e) => { console.log('You can watch my changes:', e) }
       }
+    }
+  },
+  {
+    key: 'footer',
+    footer: true,
+    cells: {
+      fruit: 'I\'m',
+      price: 'the',
+      quantity: 'footer'
     }
   }
 ];
