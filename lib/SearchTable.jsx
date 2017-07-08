@@ -304,7 +304,6 @@ export class SearchTable extends React.Component {
       showTickedOnly: this.props.showTickedOnly,
       // part of state to track expanded/collapsed status
       rows: rows,
-      selectedRow: null,
       currentPage: 0,
       numPages: this.props.rowsPerPage ? rows.length / this.props.rowsPerPage : 1
     };
@@ -345,7 +344,6 @@ export class SearchTable extends React.Component {
       this.setState({
         rows: newRows,
         sortBy: newSort,
-        selectedRow: newRows.find(r => r.selected),
         numPages: this.props.rowsPerPage ? newRows.length / this.props.rowsPerPage : 1
       });
 
@@ -688,15 +686,11 @@ export class SearchTable extends React.Component {
                     this.forceUpdate()
                   }
                 }
-                selected={r == this.state.selectedRow}
+                selected={r.selected}
                 onClick={
                   (selected) => {
                     if (r.onClick) {
                       r.onClick(selected);
-                    } else {
-                      this.setState({
-                        selectedRow: r == this.state.selectedRow ? null : r
-                      });
                     }
                   }
                 }
