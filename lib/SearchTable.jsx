@@ -648,7 +648,7 @@ export class SearchTable extends React.Component {
     if (this.props.searchChangeCallback) {
       this.props.searchChangeCallback(
         this.state.search,
-        this.filter(this.state.rows).map(r => r.userKey)
+        this.filter(this.state.rows).map(r => r.key)
       )
     }
 
