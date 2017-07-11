@@ -355,11 +355,6 @@ export class SearchTable extends React.Component {
     // coerce all row definitions to standard format
     const coercedRows = rows.map(r => CoerceRow(r))
 
-    // recursively expand any collapsed rows and assign unique indexes
-    expandRows(coercedRows, true).forEach(function(r, i) {
-      r.key = i;
-    });
-
     this.expandable = coercedRows.some(r => r.children.length);
     this.columns = Object.keys(coercedRows[0].cells);
     return coercedRows;

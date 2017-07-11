@@ -63,7 +63,9 @@ const DemoTable = (props) => {
         showExportJSONBtn={true}
         onRender={(rowkeys) => console.log(rowkeys)}
         className='table table-bordered table-striped'
-        totalsRow={true}/>
+        searchChangeCallback={(searchTerm, keys) => {
+          console.log(searchTerm, keys);
+        }}/>
     </div>
   )
 };
