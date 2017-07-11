@@ -135,7 +135,7 @@ class Row extends React.Component {
     // Child rows may not have the same column set as top-level rows.
     // When this is the case, adjust the colspan to automatically distribute
     // cells across the entire table width
-    this.colSpan = this.props.tableWidthCols / Object.keys(this.props.content.cells).length
+    this.colSpan = this.props.tableWidthCols / Object.keys(this.props.content.cells).length;
   }
 
   renderCheckBox() {
@@ -353,7 +353,12 @@ export class SearchTable extends React.Component {
 
   init(rows) {
     // coerce all row definitions to standard format
-    const coercedRows = rows.map(r => CoerceRow(r))
+    const coercedRows = rows.map(r => CoerceRow(r));
+
+    // recursively expand any collapsed rows and assign unique indexes
+    expandRows(coercedRows, true).forEach(function(r, i) {
+      r.key = i;
+    });
 
     this.expandable = coercedRows.some(r => r.children.length);
     this.columns = Object.keys(coercedRows[0].cells);
@@ -643,7 +648,7 @@ export class SearchTable extends React.Component {
     if (this.props.searchChangeCallback) {
       this.props.searchChangeCallback(
         this.state.search,
-        this.filter(this.state.rows).map(r => r.key)
+        this.filter(this.state.rows).map(r => r.id)
       )
     }
 
@@ -671,6 +676,7 @@ export class SearchTable extends React.Component {
           <tbody>{
             expandRows(this.paginatedRows(), false).map(r =>
               <Row
+                id={r.id}
                 key={r.key}
                 content={r}
                 tableWidthCols={this.columns.length}
