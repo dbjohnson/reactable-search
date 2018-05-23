@@ -116,13 +116,13 @@ const CoerceCell = (cell) => {
 
 const CoerceRow = (row) => {
   const coerce = (cells=row, children=[]) => {
-    return Object.assign(row, {
+    return {
       children: (children).map(c => CoerceRow(c)),
       cells: Object.keys(cells).reduce((map, k) => {
         map[k] = CoerceCell(cells[k]);
         return map;
       }, {})
-    });
+    }
   }
   return coerce(row.cells, row.children);
 }
@@ -310,45 +310,22 @@ export class SearchTable extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.rows) {
-      // Try comparing JSON string dumps of the rows to see if they're unchanged.
-      // This won't always work because not all rows will be stringifiable
-      try {
-        // oof, this is pretty gross and will probably break.  React components
-        // contain a reference to the parent, and so if any cells contain components
-        // such as hyperlinks, jsonification will fail due to circular refs.
-        // Let's try to avoid that by ignoring any references to '_owner'
-        const stringifySafe = (obj) => {
-          return JSON.stringify(obj, function(key, val) {
-            if (key == '_owner') {
-              return 'owner';
-            }
-            return val;
-          });
-        }
-        if (stringifySafe(nextProps.rows) == stringifySafe(this.props.rows)) {
-          return;
-        }
-      } catch (err) {}
+    const newRows = this.init(nextProps.rows);
+    let newSort = this.state.sortBy;
 
-      const newRows = this.init(nextProps.rows);
-      let newSort = this.state.sortBy;
-
-      if (nextProps.sortBy) {
-        newSort = nextProps.sortBy;
-      }
-      else if(Object.keys(newRows[0]).indexOf(this.state.sortBy) == 0) {
-        newSort = Object.keys(newRows[0])[0];
-      }
-
-      this.setState({
-        rows: newRows,
-        sortBy: newSort,
-        numPages: this.props.rowsPerPage ? newRows.length / this.props.rowsPerPage : 1
-      });
-
-      this.forceUpdate();
+    if (nextProps.sortBy) {
+      newSort = nextProps.sortBy;
+    } else if(Object.keys(newRows[0]).indexOf(this.state.sortBy) == 0) {
+      // if the columns have changed and the sortBy key is no longer present,
+      // default to the first column
+      newSort = Object.keys(newRows[0])[0];
     }
+
+    this.setState({
+      rows: newRows,
+      sortBy: newSort,
+      numPages: this.props.rowsPerPage ? newRows.length / this.props.rowsPerPage : 1,
+    });
   }
 
   init(rows) {
@@ -751,7 +728,6 @@ SearchTable.defaultProps = {
   totalsRow: false,
   totalsRowClass: 'totalsRow'
 };
-
 
 
 module.exports = SearchTable;
