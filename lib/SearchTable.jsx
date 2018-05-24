@@ -116,13 +116,13 @@ const CoerceCell = (cell) => {
 
 const CoerceRow = (row) => {
   const coerce = (cells=row, children=[]) => {
-    return {
+    return Object.assign({}, row, {
       children: (children).map(c => CoerceRow(c)),
       cells: Object.keys(cells).reduce((map, k) => {
         map[k] = CoerceCell(cells[k]);
         return map;
       }, {})
-    }
+    });
   }
   return coerce(row.cells, row.children);
 }
@@ -160,9 +160,9 @@ class Row extends React.Component {
         return (
           <td style={{width: '41px'}}>
             <ExpanderButton
-              expanded={this.props.content.expanded}
+              expanded={this.props.expanded}
               onClick={() => {
-                this.props.onExpand(!this.props.content.expanded);
+                this.props.onExpand(!this.props.expanded);
               }}
             />
           </td>
@@ -278,13 +278,13 @@ const ExportButton = (props) => {
 }
 
 
-const expandRows = (rows, force) => {
+const expandRows = (rows, force, expandedRowKeys) => {
   // recursively expand any collapsed rows
   let expanded = [];
   rows.forEach(function(r) {
     expanded.push(r)
-    if (r.expanded || force) {
-      expanded = expanded.concat(expandRows(r.children))
+    if (force || expandedRowKeys.indexOf(r.key) >= 0) {
+      expanded = expanded.concat(expandRows(r.children, force, expandedRowKeys))
     }
   });
   return expanded;
@@ -303,6 +303,7 @@ export class SearchTable extends React.Component {
       sortDesc: this.props.sortDesc,
       showTickedOnly: this.props.showTickedOnly,
       // part of state to track expanded/collapsed status
+      expandedRows: rows.filter(r => r.expanded).map(r => r.key),
       rows: rows,
       currentPage: 0,
       numPages: this.props.rowsPerPage ? rows.length / this.props.rowsPerPage : 1
@@ -333,7 +334,7 @@ export class SearchTable extends React.Component {
     const coercedRows = rows.map(r => CoerceRow(r));
 
     // recursively expand any collapsed rows and assign unique indexes
-    expandRows(coercedRows, true).forEach(function(r, i) {
+    expandRows(coercedRows, true, []).forEach(function(r, i) {
       r.key = i;
     });
 
@@ -558,12 +559,10 @@ export class SearchTable extends React.Component {
           <ExpanderButton
             expanded={this.state.allExpanded}
             onClick={() => {
-              this.state.rows.forEach(r => {
-                r.expanded = !this.state.allExpanded
-              });
               this.setState({
-                allExpanded: !this.state.allExpanded
-              });
+                allExpanded: !this.state.allExpanded,
+                expandedRows: this.state.allExpanded ? [] : this.state.rows.map(r => r.key)
+              })
             }}
           />
         </td>
@@ -651,17 +650,26 @@ export class SearchTable extends React.Component {
             </tr>
           </thead>
           <tbody>{
-            expandRows(this.paginatedRows(), false).map(r =>
+            expandRows(this.paginatedRows(), false, this.state.expandedRows).map(r =>
               <Row
                 id={r.id}
                 key={r.key}
                 content={r}
                 tableWidthCols={this.columns.length}
+                expanded={this.state.expandedRows.indexOf(r.key) >= 0}
                 expanderCol={this.expandable}
                 onExpand={
                   (ex) => {
-                    r.expanded = ex;
-                    this.forceUpdate()
+                    const expandedRows = this.state.expandedRows;
+                    if (ex) {
+                      expandedRows.push(r.key)
+                    } else {
+                      expandedRows.pop(r.key)
+                    }
+
+                    this.setState({
+                      expandedRows: expandedRows
+                    });
                   }
                 }
                 selected={r.selected}
