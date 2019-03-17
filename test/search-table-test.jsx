@@ -1,5 +1,5 @@
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
 import expect from 'expect';
 import SearchTable from '../lib/SearchTable.jsx';
 
@@ -12,6 +12,6 @@ const rows = [
 describe('SearchTable', function () {
   it('renders without problems', function () {
     const root = TestUtils.renderIntoDocument(<SearchTable rows={rows}/>);
-    expect(root).toExist();
+    expect(root).toBeTruthy();
   });
 });

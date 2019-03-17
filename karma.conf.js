@@ -15,16 +15,16 @@ module.exports = function (config) {
     webpack: { //kind of a copy of your webpack config
       devtool: 'inline-source-map', //just do inline source maps instead of the default
       module: {
-        loaders: [
-          {
-            test: /\.jsx$/,
-            loader: 'babel-loader',
-            query: {
-              plugins: ['transform-runtime'],
-              presets: ["es2015", "react"]
+        rules: [{
+          test: /.jsx?$/,
+          use: {
+            loader: "babel-loader",
+            options: {
+              presets: ['@babel/react', '@babel/env']
             }
-          }
-        ]
+          },
+          exclude: /node_modules/
+        }]
       }
     },
     webpackServer: {
