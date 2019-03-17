@@ -291,7 +291,7 @@ const expandRows = (rows, force, expandedRowKeys) => {
 }
 
 
-export class SearchTable extends React.Component {
+export default class SearchTable extends React.Component {
   constructor(props) {
     super(props);
 
@@ -736,6 +736,3 @@ SearchTable.defaultProps = {
   totalsRow: false,
   totalsRowClass: 'totalsRow'
 };
-
-
-module.exports = SearchTable;
