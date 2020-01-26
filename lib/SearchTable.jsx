@@ -660,16 +660,17 @@ export default class SearchTable extends React.Component {
                 expanderCol={this.expandable}
                 onExpand={
                   (ex) => {
-                    const expandedRows = this.state.expandedRows;
                     if (ex) {
+                      const expandedRows = this.state.expandedRows;
                       expandedRows.push(r.key)
+                      this.setState({
+                        expandedRows: expandedRows
+                      })
                     } else {
-                      expandedRows.pop(r.key)
+                      this.setState({
+                        expandedRows: this.state.expandedRows.filter(r2 => r2.key != r.key)
+                      })
                     }
-
-                    this.setState({
-                      expandedRows: expandedRows
-                    });
                   }
                 }
                 selected={r.selected}

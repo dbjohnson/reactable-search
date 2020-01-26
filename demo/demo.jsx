@@ -38,7 +38,10 @@ class DemoTable extends React.Component {
           fruit: <a target='_blank' href='https://www.google.com/search?site=imghp&q=bananas'>bananas</a>,
           price: 5,
           quantity: 0
-        }
+        },
+        children: [
+          <div>Nothing to see here</div>
+        ]
       },
       {
         selected: this.state.selectedRow == 'grapes',
