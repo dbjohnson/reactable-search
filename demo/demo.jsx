@@ -39,9 +39,11 @@ class DemoTable extends React.Component {
           price: 5,
           quantity: 0
         },
-        children: [
-          <div>Nothing to see here</div>
-        ]
+        children: [{
+          cells: {
+            nada: <div>Nothing to see here</div>
+          }
+        }]
       },
       {
         selected: this.state.selectedRow == 'grapes',
