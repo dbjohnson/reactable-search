@@ -668,7 +668,7 @@ export default class SearchTable extends React.Component {
                       })
                     } else {
                       this.setState({
-                        expandedRows: this.state.expandedRows.filter(r2 => r2.key != r.key)
+                        expandedRows: this.state.expandedRows.filter(k => k != r.key)
                       })
                     }
                   }
